@@ -163,8 +163,8 @@ let healthLog  = JSON.parse(localStorage.getItem(KEY_HEALTH) || '[]');
 let pendingImg = null;
 let pendingImgType = 'image/jpeg';
 
-// ★ 使用するモデルを1つに固定（429エラー対策）
-const GEMINI_MODEL = 'gemini-2.0-flash';
+// ★ 1日1500回まで無料のモデルを使用
+const GEMINI_MODEL = 'gemini-1.5-flash';
 
 window.addEventListener('DOMContentLoaded', () => {
   if (!API_KEY) {
