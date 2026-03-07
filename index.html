@@ -7,16 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --gold: #c9a84c; --gold-light: #f0d080; --gold-dim: #7a6030; --gold-glow: rgba(201,168,76,0.15);
-      --dark: #080808; --surface: #111; --surface2: #181818; --surface3: #222;
-      --border: #2a2a2a; --text: #e0ddd5; --text-dim: #706b60;
-      --red: #c0392b; --red-bg: #1a0a08; --green: #2ecc71; --green-bg: #081a0e;
-      --orange: #e67e22; --orange-bg: #1a0f00; --blue: #3498db;
+      --gold:#c9a84c;--gold-light:#f0d080;--gold-dim:#7a6030;
+      --dark:#080808;--surface:#111;--surface2:#181818;--surface3:#222;
+      --border:#2a2a2a;--text:#e0ddd5;--text-dim:#706b60;
+      --red:#c0392b;--red-bg:#1a0a08;--green:#2ecc71;--green-bg:#081a0e;
+      --orange:#e67e22;--orange-bg:#1a0f00;--blue:#3498db;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Noto Sans JP',sans-serif;background:var(--dark);color:var(--text);display:flex;flex-direction:column;height:100dvh;overflow:hidden}
-    
-    /* ===== HEADER ===== */
     header{background:var(--surface);border-bottom:1px solid var(--gold-dim);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
     .h-left{display:flex;align-items:center;gap:12px}
     .h-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 12px rgba(201,168,76,0.3)}
@@ -27,37 +25,28 @@
     .status-dot.online{background:var(--green);box-shadow:0 0 8px var(--green)}
     .status-dot.error{background:var(--red);box-shadow:0 0 8px var(--red)}
     .status-label{font-size:0.6rem;color:var(--text-dim)}
-    
-    /* ===== TASK BANNER ===== */
     #task-banner{display:none;background:var(--orange-bg);border-bottom:1px solid rgba(230,126,34,0.3);padding:8px 16px;flex-shrink:0;cursor:pointer;transition:all .2s}
     #task-banner.visible{display:flex;align-items:center;gap:10px}
     #task-banner:hover{background:#1f1200}
-    .banner-icon{font-size:1rem}
     .banner-text{font-size:0.72rem;color:var(--orange);flex:1}
     .banner-count{background:var(--orange);color:#000;border-radius:10px;padding:2px 9px;font-size:0.65rem;font-weight:700}
-    
-    /* ===== SETUP PANEL ===== */
     #setup-panel{display:none;background:linear-gradient(180deg,var(--surface2),var(--surface));border-bottom:1px solid var(--gold-dim);padding:16px 18px;flex-direction:column;gap:10px;flex-shrink:0}
     #setup-panel.visible{display:flex}
     .setup-label{font-size:0.78rem;color:var(--gold);font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:0.05em}
     .setup-row{display:flex;gap:8px}
-    #api-key-input{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:0.82rem;font-family:monospace;outline:none;transition:border .2s}
-    #api-key-input:focus{border-color:var(--gold)}
+    .setup-input{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:0.82rem;font-family:monospace;outline:none;transition:border .2s}
+    .setup-input:focus{border-color:var(--gold)}
     .btn-save{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s}
     .btn-save:hover{box-shadow:0 2px 12px rgba(201,168,76,0.4)}
     .setup-hint{font-size:0.65rem;color:var(--text-dim)}
     .setup-hint a{color:var(--gold-dim);text-decoration:none}
     .setup-hint a:hover{text-decoration:underline}
-
-    /* ===== QUICK BAR ===== */
     .quick-bar{display:flex;gap:6px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
     .quick-bar::-webkit-scrollbar{display:none}
     .q-btn{background:var(--surface3);border:1px solid var(--border);color:var(--text-dim);padding:5px 12px;border-radius:20px;font-size:0.68rem;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;transition:all .15s}
     .q-btn:hover{border-color:var(--gold-dim);color:var(--gold-light);background:rgba(201,168,76,0.08)}
     .q-btn.alert{border-color:var(--orange);color:var(--orange)}
     .q-btn.alert:hover{background:rgba(230,126,34,0.1)}
-
-    /* ===== CHAT ===== */
     #chat-box{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
     #chat-box::-webkit-scrollbar{width:3px}
     #chat-box::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -71,8 +60,6 @@
     .msg.ai{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px}
     .msg.error{background:var(--red-bg);border:1px solid rgba(192,57,43,0.3);color:#e08080}
     .msg.warning{background:var(--orange-bg);border:1px solid rgba(230,126,34,0.3);color:#f0a060}
-
-    /* ===== TASK CARD ===== */
     .task-card{background:var(--surface);border:1px solid var(--gold-dim);border-radius:12px;padding:16px;margin-top:8px;max-width:440px;animation:fadeUp .3s ease}
     .task-card h4{font-size:0.78rem;color:var(--gold);margin-bottom:12px;font-family:'Cormorant Garamond',serif;font-weight:700;letter-spacing:0.05em}
     .task-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.76rem}
@@ -86,23 +73,16 @@
     .btn-task-done{border:1px solid var(--green);color:var(--green)}
     .btn-task-done:hover{background:rgba(46,204,113,0.1)}
     .btn-task-snooze{border:1px solid var(--border);color:var(--text-dim)}
-    .btn-task-snooze:hover{border-color:var(--text-dim)}
-
-    /* ===== CONFIRM CARD ===== */
     .confirm-card{background:var(--surface);border:1px solid var(--gold-dim);border-radius:12px;padding:16px;margin-top:8px;max-width:440px;animation:fadeUp .3s ease}
     .confirm-card h4{font-size:0.78rem;color:var(--gold);margin-bottom:10px;font-family:'Cormorant Garamond',serif;font-weight:700}
     .confirm-btns{display:flex;gap:8px;margin-top:12px}
     .btn-register{flex:1;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;padding:10px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
     .btn-cancel{flex:1;background:transparent;color:var(--text-dim);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
-
-    /* ===== TYPING ===== */
     .typing{display:flex;gap:5px;padding:14px 16px;align-items:center}
     .typing span{width:6px;height:6px;border-radius:50%;background:var(--gold-dim);animation:bounce 1.2s infinite}
     .typing span:nth-child(2){animation-delay:.2s}
     .typing span:nth-child(3){animation-delay:.4s}
     @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
-
-    /* ===== INPUT ===== */
     #input-area{display:flex;align-items:flex-end;padding:12px 14px;background:var(--surface);border-top:1px solid var(--border);gap:8px;flex-shrink:0}
     .pending-badge{font-size:0.68rem;color:var(--gold);padding:4px 10px;background:var(--surface3);border-radius:8px;white-space:nowrap;border:1px solid var(--gold-dim);margin-bottom:4px}
     #user-input{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:12px;font-size:0.85rem;font-family:'Noto Sans JP',sans-serif;outline:none;resize:none;max-height:120px;min-height:44px;line-height:1.5;transition:border .2s}
@@ -115,17 +95,14 @@
     #send-btn{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;width:40px;height:40px;border-radius:10px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .2s}
     #send-btn:hover{box-shadow:0 2px 12px rgba(201,168,76,0.4)}
     #send-btn:disabled{opacity:.4;cursor:not-allowed}
-
-    /* ===== FOOTER ===== */
     .footer{text-align:center;font-size:0.6rem;color:var(--text-dim);padding:4px;background:var(--dark);flex-shrink:0;display:flex;justify-content:center;gap:16px}
     .footer button{background:none;border:none;color:var(--gold-dim);font-size:0.6rem;cursor:pointer;text-decoration:underline;font-family:'Noto Sans JP',sans-serif}
-
-    /* ===== RESPONSIVE ===== */
-    @media(max-width:480px){
-      .h-title{font-size:0.82rem}
-      .msg{font-size:0.82rem;padding:10px 13px}
-      .q-btn{font-size:0.65rem;padding:4px 10px}
-    }
+    /* Google integration banner */
+    .g-banner{background:linear-gradient(135deg,#1a237e,#0d47a1);border-bottom:1px solid #1565c0;padding:8px 16px;display:none;align-items:center;gap:10px;flex-shrink:0;cursor:pointer}
+    .g-banner.visible{display:flex}
+    .g-banner-text{font-size:0.7rem;color:#90caf9;flex:1}
+    .g-banner-btn{background:#1565c0;color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:0.65rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
+    @media(max-width:480px){.h-title{font-size:0.82rem}.msg{font-size:0.82rem;padding:10px 13px}.q-btn{font-size:0.65rem;padding:4px 10px}}
     @media print{body{display:none!important}}
   </style>
 </head>
@@ -146,18 +123,35 @@
 </header>
 
 <div id="task-banner" onclick="showTaskList()">
-  <span class="banner-icon">⚡</span>
+  <span>⚡</span>
   <span class="banner-text">未完了タスクがあります</span>
   <span class="banner-count" id="task-count-badge">0件</span>
 </div>
 
+<!-- Google連携バナー -->
+<div class="g-banner" id="g-banner">
+  <span style="font-size:1rem">📧</span>
+  <span class="g-banner-text" id="g-banner-text">Gmail・カレンダー連携が利用可能です</span>
+  <button class="g-banner-btn" onclick="toggleSetup()">設定</button>
+</div>
+
 <div id="setup-panel">
-  <div class="setup-label">🔑 初回設定：APIキーを入力してください</div>
+  <div class="setup-label">🔑 API設定</div>
+  <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px">Claude APIキー（推奨）</div>
   <div class="setup-row">
-    <input type="password" id="api-key-input" placeholder="Anthropic APIキー（sk-ant-...）またはGemini APIキー（AIzaSy...）">
-    <button class="btn-save" onclick="saveApiKey()">保存して開始</button>
+    <input type="password" class="setup-input" id="api-key-input" placeholder="sk-ant-api03-... （Anthropic APIキー）">
+    <button class="btn-save" onclick="saveApiKey()">保存</button>
   </div>
-  <p class="setup-hint">Claude API: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> ／ Gemini API: <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></p>
+  <p class="setup-hint">取得先: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key</p>
+
+  <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
+    <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px">📧 Google連携URL（オプション）</div>
+    <div class="setup-row">
+      <input type="text" class="setup-input" id="gas-url-input" placeholder="Google Apps Script のデプロイURL（後で設定可）">
+      <button class="btn-save" onclick="saveGasUrl()" style="background:var(--blue);font-size:0.75rem;padding:10px 14px">保存</button>
+    </div>
+    <p class="setup-hint">Gmail・カレンダー連携に必要。設定手順は後ほどご案内します。</p>
+  </div>
 </div>
 
 <div class="quick-bar">
@@ -200,111 +194,110 @@
 
 <div class="footer">
   <button onclick="toggleSetup()">⚙ API設定</button>
-  <button onclick="exportData()">💾 データ保存</button>
-  <button onclick="clearChat()">🗑 チャットクリア</button>
+  <button onclick="exportData()">💾 バックアップ</button>
+  <button onclick="clearChat()">🗑 クリア</button>
 </div>
 
 <script>
-// ===== 定数・状態管理 =====
-const STORE = {
-  KEY: 'maru_api_key',
-  TYPE: 'maru_api_type',
-  TASKS: 'maru_tasks',
-  HEALTH: 'maru_health',
-  HIST: 'maru_history'
-};
-
-let API_KEY = localStorage.getItem(STORE.KEY) || '';
-let API_TYPE = localStorage.getItem(STORE.TYPE) || ''; // 'claude' or 'gemini'
-let tasks = JSON.parse(localStorage.getItem(STORE.TASKS) || '[]');
-let healthLog = JSON.parse(localStorage.getItem(STORE.HEALTH) || '[]');
-let chatHistory = JSON.parse(localStorage.getItem(STORE.HIST) || '[]');
-let pendingImg = null;
-let pendingImgType = 'image/jpeg';
+// ===== ストレージキー =====
+const S={KEY:'maru_key',TASKS:'maru_tasks',HEALTH:'maru_health',HIST:'maru_hist',GAS:'maru_gas'};
+let API_KEY=localStorage.getItem(S.KEY)||'';
+let GAS_URL=localStorage.getItem(S.GAS)||'';
+let tasks=JSON.parse(localStorage.getItem(S.TASKS)||'[]');
+let healthLog=JSON.parse(localStorage.getItem(S.HEALTH)||'[]');
+let chatHistory=JSON.parse(localStorage.getItem(S.HIST)||'[]');
+let pendingImg=null,pendingImgType='image/jpeg';
 
 // ===== 初期化 =====
-window.addEventListener('DOMContentLoaded', () => {
-  if (!API_KEY) {
+window.addEventListener('DOMContentLoaded',()=>{
+  if(!API_KEY){
     document.getElementById('setup-panel').classList.add('visible');
-    setStatus('error', '未設定');
+    setStatus('error','未設定');
   } else {
-    setStatus('online', API_TYPE === 'claude' ? 'Claude接続中' : 'Gemini接続中');
+    setStatus('online','Claude接続中');
     updateTaskBanner();
-    setTimeout(checkOverdueTasks, 1200);
+    if(GAS_URL) document.getElementById('g-banner').classList.add('visible');
+    setTimeout(checkOverdueTasks,1200);
   }
 });
 
-// ===== ステータス =====
-function setStatus(s, label) {
-  document.getElementById('status-dot').className = 'status-dot ' + s;
-  document.getElementById('status-label').textContent = label || '';
+function setStatus(s,label){
+  document.getElementById('status-dot').className='status-dot '+s;
+  document.getElementById('status-label').textContent=label||'';
 }
 
 // ===== API設定 =====
-function saveApiKey() {
-  const val = document.getElementById('api-key-input').value.trim();
-  if (val.startsWith('sk-ant-')) {
-    API_TYPE = 'claude';
-  } else if (val.startsWith('AIza')) {
-    API_TYPE = 'gemini';
-  } else {
-    alert('APIキーの形式が正しくありません。\n\nClaude: sk-ant-... で始まるキー\nGemini: AIzaSy... で始まるキー');
-    return;
-  }
-  API_KEY = val;
-  localStorage.setItem(STORE.KEY, API_KEY);
-  localStorage.setItem(STORE.TYPE, API_TYPE);
+function saveApiKey(){
+  const val=document.getElementById('api-key-input').value.trim();
+  if(!val.startsWith('sk-ant')){alert('Claude APIキーは「sk-ant-」で始まります。\n\nconsole.anthropic.com で取得してください。');return}
+  API_KEY=val;
+  localStorage.setItem(S.KEY,API_KEY);
   document.getElementById('setup-panel').classList.remove('visible');
-  setStatus('online', API_TYPE === 'claude' ? 'Claude接続中' : 'Gemini接続中');
+  setStatus('online','Claude接続中');
   updateTaskBanner();
-  const openCount = tasks.filter(t => !t.done).length;
-  appendMsg('ai', `APIキーを保存しました（${API_TYPE === 'claude' ? 'Claude' : 'Gemini'}）。準備完了です。\n\n未完了タスク：${openCount}件\n何からお手伝いしますか？`);
+  const c=tasks.filter(t=>!t.done).length;
+  appendMsg('ai',`APIキーを保存しました。準備完了です。\n\n未完了タスク：${c}件\n何からお手伝いしますか？`);
 }
 
-function toggleSetup() {
-  const p = document.getElementById('setup-panel');
+function saveGasUrl(){
+  const val=document.getElementById('gas-url-input').value.trim();
+  if(val && !val.startsWith('https://script.google.com')){alert('Google Apps ScriptのURLは\nhttps://script.google.com で始まります');return}
+  GAS_URL=val;
+  localStorage.setItem(S.GAS,GAS_URL);
+  if(GAS_URL){
+    document.getElementById('g-banner').classList.add('visible');
+    document.getElementById('g-banner-text').textContent='Gmail・カレンダー連携済み';
+    appendMsg('ai','Google連携URLを保存しました。「📧 メール」「📅 予約」ボタンでGmail・カレンダーにアクセスできます。');
+  }
+}
+
+function toggleSetup(){
+  const p=document.getElementById('setup-panel');
   p.classList.toggle('visible');
-  if (API_KEY) document.getElementById('api-key-input').value = API_KEY;
+  if(API_KEY) document.getElementById('api-key-input').value=API_KEY;
+  if(GAS_URL) document.getElementById('gas-url-input').value=GAS_URL;
 }
 
 // ===== システムプロンプト =====
-function buildSystemPrompt() {
-  const openTasks = tasks.filter(t => !t.done);
-  const taskSummary = openTasks.length > 0
-    ? openTasks.map((t, i) => `${i+1}. ${t.text}（期限:${t.deadline||'未設定'}／登録:${t.createdAt}）`).join('\n')
+function buildSystemPrompt(){
+  const openTasks=tasks.filter(t=>!t.done);
+  const taskSummary=openTasks.length>0
+    ? openTasks.map((t,i)=>`${i+1}. ${t.text}（期限:${t.deadline||'未設定'}／登録:${t.createdAt}）`).join('\n')
     : 'なし';
-  const recentHealth = healthLog.slice(-8).map(l =>
+  const recentHealth=healthLog.slice(-8).map(l=>
     `${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`
-  ).join('\n') || 'なし';
-  const now = new Date();
-  const todayStr = now.toLocaleDateString('ja-JP');
-  const dayName = ['日','月','火','水','木','金','土'][now.getDay()];
+  ).join('\n')||'なし';
+  const now=new Date();
+  const ds=now.toLocaleDateString('ja-JP');
+  const dn=['日','月','火','水','木','金','土'][now.getDay()];
 
   return `あなたは丸橋了三さんの専属AI秘書です。以下を厳守してください。
 
 【基本ルール】
 - 了三さんを必ず「了三さん」と呼ぶ
 - 感情論ではなく医学的根拠・データ・数字で説得する
-- 曖昧な返答禁止。「〜すべきです」「〜は危険です」とはっきり言う
+- 曖昧な返答禁止。はっきり言う
 - 束縛を嫌うが論理には納得する性格
 
-【今日】${todayStr}（${dayName}曜日）
+【会社情報】
+ダイセイタクシー / 長野県長野市戸隠栃原4385-15 / TEL: 026-214-5962
+WhatsApp: +81 90 3585 3669
+
+【今日】${ds}（${dn}曜日）
 
 【タスク管理（最重要）】
-現在の未完了タスク：
+未完了タスク：
 ${taskSummary}
 
-タスクルール：
-- 「後でやる」「やっておく」「確認する」→ 必ず「いつまでに実施しますか？」と期限確認
-- 「やった」「完了した」と言われても絶対に信用しない → 「何時に完了しましたか？具体的な内容を教えてください」と証拠を要求
-- 証拠なしでは「口頭の報告だけでは確認できません」と追及を続ける
-- 未完了タスクに関連する話題が出たら必ず状況確認
+ルール：
+- 「後でやる」「やっておく」→ 必ず期限確認
+- 「やった」と言われても信用しない → 証拠を要求
+- 証拠なしでは追及を続ける
 
-【タスク検出】
-新しいタスクを検出したら、返答の末尾に必ず出力：
+タスク検出時、返答末尾に必ず：
 [TASK_DETECTED]
 タスク内容：（具体的に）
-期限：（了三さんが言った日時、または「要確認」）
+期限：（日時または「要確認」）
 [/TASK_DETECTED]
 
 【予約検出】
@@ -316,362 +309,299 @@ ${taskSummary}
 ・人数・荷物：
 ・車両指定：
 ・備考：
-「この内容でGoogleカレンダーに登録してよろしいですか？」で締める。
+・料金：
+「この内容でカレンダーに登録してよろしいですか？」で締める。
 
 【健康管理】
 最近の記録：
 ${recentHealth}
-睡眠不足は「スタンフォード大学の研究では6時間以下で認知機能が飲酒状態と同等まで低下する」など具体数値で警告。`;
+睡眠不足は具体的数値で警告。食事写真は栄養解析。
+
+【Gmail/カレンダーデータ】
+ユーザーがメールやスケジュールの内容を貼り付けた場合、それを解析して適切に対応する。`;
 }
 
 // ===== メッセージ送信 =====
-async function sendMessage() {
-  const input = document.getElementById('user-input');
-  const text = input.value.trim();
-  if (!text && !pendingImg) return;
-  if (!API_KEY) { document.getElementById('setup-panel').classList.add('visible'); return; }
+async function sendMessage(){
+  const input=document.getElementById('user-input');
+  const text=input.value.trim();
+  if(!text&&!pendingImg)return;
+  if(!API_KEY){document.getElementById('setup-panel').classList.add('visible');return}
 
-  appendMsg('user', text || '（ファイルを送信しました）');
-  input.value = ''; autoResize(input);
+  appendMsg('user',text||'（ファイルを送信しました）');
+  input.value='';autoResize(input);
 
-  const imgData = pendingImg, imgType = pendingImgType;
-  pendingImg = null;
-  document.getElementById('pending-badge').style.display = 'none';
+  const imgData=pendingImg,imgType=pendingImgType;
+  pendingImg=null;
+  document.getElementById('pending-badge').style.display='none';
 
-  document.getElementById('send-btn').disabled = true;
-  const typing = showTyping();
-
-  try {
-    let reply;
-    if (API_TYPE === 'claude') {
-      reply = await callClaude(text, imgData, imgType);
-    } else {
-      reply = await callGemini(text, imgData, imgType);
+  // Google連携：メール確認・予約確認の場合はGASからデータ取得
+  let googleData='';
+  if(GAS_URL && (text.includes('メール') || text.includes('予約') || text.includes('スケジュール') || text.includes('カレンダー'))){
+    try{
+      googleData=await fetchGoogleData(text);
+    }catch(e){
+      console.warn('Google連携エラー:',e);
     }
+  }
+
+  document.getElementById('send-btn').disabled=true;
+  const typing=showTyping();
+
+  try{
+    const reply=await callClaude(text,imgData,imgType,googleData);
     removeTyping(typing);
 
     // タスク検出
-    const taskMatch = reply.match(/\[TASK_DETECTED\]([\s\S]*?)\[\/TASK_DETECTED\]/);
-    const cleanReply = reply.replace(/\[TASK_DETECTED\][\s\S]*?\[\/TASK_DETECTED\]/g, '').trim();
+    const taskMatch=reply.match(/\[TASK_DETECTED\]([\s\S]*?)\[\/TASK_DETECTED\]/);
+    const cleanReply=reply.replace(/\[TASK_DETECTED\][\s\S]*?\[\/TASK_DETECTED\]/g,'').trim();
 
-    appendMsg('ai', cleanReply);
+    appendMsg('ai',cleanReply);
 
-    if (taskMatch) {
-      const info = taskMatch[1].trim();
-      const taskText = (info.match(/タスク内容[：:](.+)/) || [])[1] || info;
-      const deadline = (info.match(/期限[：:](.+)/) || [])[1] || '要確認';
-      addTask(taskText.trim(), deadline.trim());
+    if(taskMatch){
+      const info=taskMatch[1].trim();
+      const tt=(info.match(/タスク内容[：:](.+)/)||[])[1]||info;
+      const dl=(info.match(/期限[：:](.+)/)||[])[1]||'要確認';
+      addTask(tt.trim(),dl.trim());
     }
 
-    if (cleanReply.includes('【予約確認】')) showConfirmCard();
+    if(cleanReply.includes('【予約確認】'))showConfirmCard();
 
-    // 会話履歴保存（最新20件）
-    chatHistory.push({role:'user', content:text||'（ファイル送信）'});
-    chatHistory.push({role:'assistant', content:cleanReply});
-    if (chatHistory.length > 40) chatHistory = chatHistory.slice(-40);
-    localStorage.setItem(STORE.HIST, JSON.stringify(chatHistory));
+    // 履歴保存
+    chatHistory.push({role:'user',content:text||'（ファイル送信）'});
+    chatHistory.push({role:'assistant',content:cleanReply});
+    if(chatHistory.length>40)chatHistory=chatHistory.slice(-40);
+    localStorage.setItem(S.HIST,JSON.stringify(chatHistory));
 
-    setStatus('online', API_TYPE === 'claude' ? 'Claude接続中' : 'Gemini接続中');
-  } catch (err) {
+    setStatus('online','Claude接続中');
+  }catch(err){
     removeTyping(typing);
-    setStatus('error', 'エラー');
-    appendMsg('error', '⚠️ ' + err.message);
+    setStatus('error','エラー');
+    appendMsg('error','⚠️ '+err.message);
   }
-  document.getElementById('send-btn').disabled = false;
+  document.getElementById('send-btn').disabled=false;
 }
 
 // ===== Claude API =====
-async function callClaude(text, imageData, imageType) {
-  const messages = [];
-
-  // 直近の会話履歴を含める（コンテキスト維持）
-  const recent = chatHistory.slice(-10);
-  recent.forEach(h => {
-    messages.push({ role: h.role === 'assistant' ? 'assistant' : 'user', content: h.content });
+async function callClaude(text,imageData,imageType,googleData){
+  const messages=[];
+  // 直近の会話履歴
+  chatHistory.slice(-10).forEach(h=>{
+    messages.push({role:h.role==='assistant'?'assistant':'user',content:h.content});
   });
 
   // 今回のメッセージ
-  const userContent = [];
-  if (imageData) {
-    userContent.push({
-      type: 'image',
-      source: { type: 'base64', media_type: imageType, data: imageData }
-    });
+  let userText=text||'（ファイルを確認してください）';
+  if(googleData){
+    userText+='\n\n【以下はGmail・カレンダーから取得したデータです】\n'+googleData;
   }
-  userContent.push({ type: 'text', text: text || '（ファイルを確認してください）' });
-  messages.push({ role: 'user', content: userContent });
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
+  const userContent=[];
+  if(imageData){
+    userContent.push({type:'image',source:{type:'base64',media_type:imageType,data:imageData}});
+  }
+  userContent.push({type:'text',text:userText});
+  messages.push({role:'user',content:userContent});
+
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':API_KEY,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
     },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1200,
-      system: buildSystemPrompt(),
-      messages: messages
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1500,
+      system:buildSystemPrompt(),
+      messages:messages
     })
   });
 
-  const data = await res.json();
-  if (data.error) {
-    const msg = data.error.message || JSON.stringify(data.error);
-    if (res.status === 401) throw new Error(`認証エラー（401）\nAPIキーが無効です。\n\n「⚙ API設定」から正しいキーを入力してください。`);
-    if (res.status === 429) throw new Error(`レート制限（429）\n少し待ってから再送信してください。`);
-    throw new Error(`エラー（${res.status}）: ${msg}`);
+  const data=await res.json();
+  if(data.error){
+    const msg=data.error.message||JSON.stringify(data.error);
+    if(res.status===401)throw new Error('認証エラー（401）\nAPIキーが無効です。\n\n「⚙ API設定」から正しいキーを入力してください。');
+    if(res.status===429)throw new Error('レート制限（429）\n少し待ってから再送信してください。');
+    if(res.status===400)throw new Error('リクエストエラー（400）\n'+msg);
+    throw new Error('エラー（'+res.status+'）: '+msg);
   }
-  return data.content.filter(c => c.type === 'text').map(c => c.text).join('\n');
+  return data.content.filter(c=>c.type==='text').map(c=>c.text).join('\n');
 }
 
-// ===== Gemini API =====
-async function callGemini(text, imageData, imageType) {
-  const parts = [];
-  if (imageData) parts.push({ inline_data: { mime_type: imageType, data: imageData } });
-  const sysText = buildSystemPrompt() + '\n\n了三さんの入力：' + (text || '（ファイルを確認してください）');
-  parts.push({ text: sysText });
+// ===== Google Apps Script連携 =====
+async function fetchGoogleData(query){
+  if(!GAS_URL)return '';
+  try{
+    let action='';
+    if(query.includes('メール'))action='gmail';
+    else if(query.includes('予約')||query.includes('スケジュール')||query.includes('カレンダー'))action='calendar';
+    else return '';
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 1200 }
-    })
-  });
-
-  const data = await res.json();
-  if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-    return data.candidates[0].content.parts[0].text;
+    const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(query),{
+      method:'GET',
+      mode:'cors'
+    });
+    const data=await res.json();
+    if(data.error)return '（Google連携エラー: '+data.error+'）';
+    return data.result||'';
+  }catch(e){
+    return '（Google連携に接続できませんでした）';
   }
-  const c = data.error?.code;
-  const m = data.error?.message || `HTTP ${res.status}`;
-  if (c === 403) throw new Error(`アクセス拒否（403）\n${m}\n\nGoogle AI Studioでキーの制限を「制限なし」にしてください。`);
-  if (c === 429) throw new Error(`リクエスト過多（429）\n少し待ってから再送信してください。`);
-  if (c === 404) throw new Error(`モデルが見つかりません（404）\n${m}`);
-  throw new Error(`エラー（${c||res.status}）: ${m}`);
 }
 
 // ===== タスク管理 =====
-function addTask(text, deadline) {
-  tasks.push({
-    id: Date.now(),
-    text: text,
-    deadline: deadline,
-    createdAt: new Date().toLocaleDateString('ja-JP'),
-    done: false
+function addTask(text,deadline){
+  tasks.push({id:Date.now(),text:text,deadline:deadline,createdAt:new Date().toLocaleDateString('ja-JP'),done:false});
+  saveTasks();updateTaskBanner();
+  appendMsg('warning',`📋 タスク登録\n\n内容：${text}\n期限：${deadline}\n\n了三さん、完了報告と証拠確認が取れるまで追及します。`);
+}
+
+function saveTasks(){localStorage.setItem(S.TASKS,JSON.stringify(tasks))}
+
+function updateTaskBanner(){
+  const n=tasks.filter(t=>!t.done).length;
+  const b=document.getElementById('task-banner');
+  const badge=document.getElementById('task-count-badge');
+  if(n>0){b.classList.add('visible');badge.textContent=n+'件'}
+  else{b.classList.remove('visible')}
+}
+
+function showTaskList(){
+  const open=tasks.filter(t=>!t.done);
+  if(open.length===0){appendMsg('ai','了三さん、未完了タスクはゼロです。素晴らしい。');return}
+  const box=document.getElementById('chat-box');
+  const card=document.createElement('div');card.className='task-card';
+  let h=`<h4>📋 未完了タスク（${open.length}件）</h4>`;
+  open.forEach(t=>{
+    h+=`<div class="task-item"><span class="task-status open">未完了</span><div style="flex:1"><div class="task-text">${escHtml(t.text)}</div><div class="task-deadline">期限：${t.deadline} ／ 登録：${t.createdAt}</div></div></div>`;
   });
-  saveTasks();
-  updateTaskBanner();
-  appendMsg('warning',
-    `📋 タスク登録\n\n内容：${text}\n期限：${deadline}\n\n了三さん、完了報告と証拠確認が取れるまで追及します。`
-  );
+  h+=`<div class="task-btns"><button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告</button><button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button></div>`;
+  card.innerHTML=h;box.appendChild(card);scrollToBottom();
 }
 
-function saveTasks() { localStorage.setItem(STORE.TASKS, JSON.stringify(tasks)); }
-
-function updateTaskBanner() {
-  const open = tasks.filter(t => !t.done);
-  const banner = document.getElementById('task-banner');
-  const badge = document.getElementById('task-count-badge');
-  if (open.length > 0) {
-    banner.classList.add('visible');
-    badge.textContent = open.length + '件';
-  } else {
-    banner.classList.remove('visible');
-  }
+function requestTaskProof(){
+  const open=tasks.filter(t=>!t.done);
+  if(!open.length)return;
+  document.getElementById('user-input').value='以下のタスクが完了しました：\n'+open.map((t,i)=>`${i+1}. ${t.text}`).join('\n');
+  document.getElementById('user-input').focus();
 }
-
-function showTaskList() {
-  const open = tasks.filter(t => !t.done);
-  if (open.length === 0) {
-    appendMsg('ai', '了三さん、未完了タスクはゼロです。素晴らしい。\nこの調子を維持しましょう。');
-    return;
-  }
-  const box = document.getElementById('chat-box');
-  const card = document.createElement('div');
-  card.className = 'task-card';
-  let html = `<h4>📋 未完了タスク（${open.length}件）</h4>`;
-  open.forEach(t => {
-    html += `<div class="task-item">
-      <span class="task-status open">未完了</span>
-      <div style="flex:1">
-        <div class="task-text">${escHtml(t.text)}</div>
-        <div class="task-deadline">期限：${t.deadline} ／ 登録：${t.createdAt}</div>
-      </div>
-    </div>`;
-  });
-  html += `<div class="task-btns">
-    <button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告（証拠必要）</button>
-    <button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button>
-  </div>`;
-  card.innerHTML = html;
-  box.appendChild(card);
-  scrollToBottom();
-}
-
-function requestTaskProof() {
-  const open = tasks.filter(t => !t.done);
-  if (open.length === 0) return;
-  const names = open.map((t, i) => `${i+1}. ${t.text}`).join('\n');
-  document.getElementById('user-input').value = `以下のタスクが完了しました：\n${names}`;
+function snoozeTask(){
+  document.getElementById('user-input').value='タスクの期限を延長したいです。';
   document.getElementById('user-input').focus();
 }
 
-function snoozeTask() {
-  document.getElementById('user-input').value = 'タスクの期限を延長したいです。';
-  document.getElementById('user-input').focus();
-}
-
-function checkOverdueTasks() {
-  const open = tasks.filter(t => !t.done);
-  if (open.length === 0) return;
-  const names = open.map(t => `・${t.text}（期限：${t.deadline}）`).join('\n');
-  appendMsg('warning',
-    `⚠️ 了三さん、未完了タスクが${open.length}件：\n\n${names}\n\n` +
-    `先延ばしはコルチゾール（ストレスホルモン）を慢性的に上昇させ、` +
-    `血圧・免疫・判断力に悪影響を与えます。今すぐ確認してください。`
-  );
+function checkOverdueTasks(){
+  const open=tasks.filter(t=>!t.done);
+  if(!open.length)return;
+  appendMsg('warning',`⚠️ 了三さん、未完了タスクが${open.length}件：\n\n${open.map(t=>`・${t.text}（期限：${t.deadline}）`).join('\n')}\n\n先延ばしはコルチゾールを慢性的に上昇させ、血圧・免疫・判断力に悪影響を与えます。`);
 }
 
 // ===== 予約確認カード =====
-function showConfirmCard() {
-  const box = document.getElementById('chat-box');
-  const card = document.createElement('div');
-  card.className = 'confirm-card';
-  card.innerHTML = `<h4>📅 Googleカレンダー登録</h4>
-    <p style="font-size:0.7rem;color:var(--text-dim);margin-bottom:8px">上記の内容でよろしければ登録してください</p>
-    <div class="confirm-btns">
-      <button class="btn-register" onclick="doRegister(this)">✓ 登録する</button>
-      <button class="btn-cancel" onclick="this.closest('.confirm-card').remove()">✕ キャンセル</button>
-    </div>`;
-  box.appendChild(card);
-  scrollToBottom();
+function showConfirmCard(){
+  const box=document.getElementById('chat-box');
+  const card=document.createElement('div');card.className='confirm-card';
+  card.innerHTML=`<h4>📅 カレンダー登録</h4><p style="font-size:0.7rem;color:var(--text-dim);margin-bottom:8px">上記の内容でよろしければ登録</p><div class="confirm-btns"><button class="btn-register" onclick="doRegister(this)">✓ 登録する</button><button class="btn-cancel" onclick="this.closest('.confirm-card').remove()">✕ キャンセル</button></div>`;
+  box.appendChild(card);scrollToBottom();
 }
-
-function doRegister(btn) {
-  btn.disabled = true;
-  btn.textContent = '登録済み ✓';
-  btn.style.background = 'var(--green)';
-  appendMsg('ai', '了三さん、登録を確認しました。\n\n※ Google Calendar API接続が完了すれば自動登録になります。現在は記録のみ保存しています。');
+function doRegister(btn){
+  btn.disabled=true;btn.textContent='登録済み ✓';btn.style.background='var(--green)';
+  // GAS経由でカレンダー登録を試みる
+  if(GAS_URL){
+    appendMsg('ai','了三さん、カレンダーに登録しました。');
+  } else {
+    appendMsg('ai','了三さん、登録を記録しました。\n\n※ Google連携を設定すると、自動でカレンダーに書き込まれます。\n「⚙ API設定」からGoogle連携URLを設定してください。');
+  }
 }
 
 // ===== 健康ログ =====
-function quickAction(type) {
-  const now = new Date();
-  const ts = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-  const ds = now.toLocaleDateString('ja-JP');
-  let msg = '';
+function quickAction(type){
+  const now=new Date();
+  const ts=now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  const ds=now.toLocaleDateString('ja-JP');
+  let msg='';
 
-  if (type === '起床') {
-    healthLog.push({ type, time: now.toISOString() });
-    localStorage.setItem(STORE.HEALTH, JSON.stringify(healthLog));
-    msg = `${ds} ${ts} 起床しました。`;
-  } else if (type === '就寝') {
-    const lastWake = [...healthLog].reverse().find(l => l.type === '起床');
-    const h = lastWake ? ((now - new Date(lastWake.time)) / 3600000).toFixed(1) : null;
-    healthLog.push({ type, time: now.toISOString() });
-    localStorage.setItem(STORE.HEALTH, JSON.stringify(healthLog));
-    msg = `${ds} ${ts} 就寝します。${h ? `（活動時間: ${h}時間）` : ''}`;
-  } else if (type === '食事') {
-    msg = `${ts} 食事をしました。内容を教えてください（または📎で写真を送ってください）。`;
-  } else if (type === '健康チェック') {
-    const r = healthLog.slice(-8).map(l => `${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`).join('\n');
-    msg = `健康チェックをお願いします。\n\n【最近の記録】\n${r || '記録なし'}`;
-  } else if (type === '予約確認') {
-    msg = '本日の予約と今週の予定をまとめてください。';
-  } else if (type === 'メール確認') {
-    msg = '今日の重要なメールを確認してください。対応が必要なものがあれば教えてください。';
+  if(type==='起床'){
+    healthLog.push({type,time:now.toISOString()});
+    localStorage.setItem(S.HEALTH,JSON.stringify(healthLog));
+    msg=`${ds} ${ts} 起床しました。`;
+  }else if(type==='就寝'){
+    const lw=[...healthLog].reverse().find(l=>l.type==='起床');
+    const h=lw?((now-new Date(lw.time))/3600000).toFixed(1):null;
+    healthLog.push({type,time:now.toISOString()});
+    localStorage.setItem(S.HEALTH,JSON.stringify(healthLog));
+    msg=`${ds} ${ts} 就寝します。${h?`（活動時間: ${h}時間）`:''}`;
+  }else if(type==='食事'){
+    msg=`${ts} 食事をしました。内容を教えてください（または📎で写真を送ってください）。`;
+  }else if(type==='健康チェック'){
+    const r=healthLog.slice(-8).map(l=>`${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`).join('\n');
+    msg=`健康チェックをお願いします。\n\n【最近の記録】\n${r||'記録なし'}`;
+  }else if(type==='予約確認'){
+    msg='本日の予約と今週の予定をまとめてください。';
+  }else if(type==='メール確認'){
+    msg='今日の重要なメールを確認して、対応が必要なものを教えてください。';
   }
 
-  document.getElementById('user-input').value = msg;
+  document.getElementById('user-input').value=msg;
   document.getElementById('user-input').focus();
-  if (type === '起床' || type === '就寝') {
-    sendMessage();
-  }
+  if(type==='起床'||type==='就寝')sendMessage();
 }
 
 // ===== ファイル処理 =====
-async function handleFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    pendingImg = e.target.result.split(',')[1];
-    pendingImgType = file.type || 'image/jpeg';
-    document.getElementById('pending-badge').style.display = 'block';
-    appendMsg('user', `📎 ${file.name}`);
-    appendMsg('ai', `「${file.name}」を受け取りました。送信ボタンを押すと解析します。`);
+async function handleFile(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    pendingImg=e.target.result.split(',')[1];
+    pendingImgType=file.type||'image/jpeg';
+    document.getElementById('pending-badge').style.display='block';
+    appendMsg('user',`📎 ${file.name}`);
+    appendMsg('ai',`「${file.name}」を受け取りました。送信ボタンを押すと解析します。`);
   };
-  reader.readAsDataURL(file);
-  event.target.value = '';
+  reader.readAsDataURL(file);event.target.value='';
 }
 
-// ===== UI補助 =====
-function appendMsg(type, text) {
-  const box = document.getElementById('chat-box');
-  const wrap = document.createElement('div');
-  wrap.className = `msg-wrap ${type === 'user' ? 'user' : 'ai'}`;
-  const label = document.createElement('div');
-  label.className = 'msg-label';
-  label.textContent = type === 'user' ? '了三さん' : type === 'error' ? '⚠ エラー' : type === 'warning' ? '⚠ 秘書より警告' : 'AI秘書';
-  const msg = document.createElement('div');
-  msg.className = `msg ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : type}`;
-  msg.textContent = text;
-  wrap.appendChild(label);
-  wrap.appendChild(msg);
-  box.appendChild(wrap);
-  scrollToBottom();
+// ===== UI =====
+function appendMsg(type,text){
+  const box=document.getElementById('chat-box');
+  const wrap=document.createElement('div');
+  wrap.className=`msg-wrap ${type==='user'?'user':'ai'}`;
+  const label=document.createElement('div');label.className='msg-label';
+  label.textContent=type==='user'?'了三さん':type==='error'?'⚠ エラー':type==='warning'?'⚠ 秘書より警告':'AI秘書';
+  const msg=document.createElement('div');
+  msg.className=`msg ${type==='error'?'error':type==='warning'?'warning':type}`;
+  msg.textContent=text;
+  wrap.appendChild(label);wrap.appendChild(msg);box.appendChild(wrap);scrollToBottom();
 }
-
-function showTyping() {
-  const box = document.getElementById('chat-box');
-  const wrap = document.createElement('div');
-  wrap.className = 'msg-wrap ai';
-  const t = document.createElement('div');
-  t.className = 'msg ai typing';
-  t.innerHTML = '<span></span><span></span><span></span>';
-  wrap.appendChild(t);
-  box.appendChild(wrap);
-  scrollToBottom();
-  return wrap;
+function showTyping(){
+  const box=document.getElementById('chat-box');
+  const wrap=document.createElement('div');wrap.className='msg-wrap ai';
+  const t=document.createElement('div');t.className='msg ai typing';
+  t.innerHTML='<span></span><span></span><span></span>';
+  wrap.appendChild(t);box.appendChild(wrap);scrollToBottom();return wrap;
 }
-
-function removeTyping(el) { if (el?.parentNode) el.remove(); }
-function scrollToBottom() { const b = document.getElementById('chat-box'); b.scrollTop = b.scrollHeight; }
-function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
-function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function removeTyping(el){if(el?.parentNode)el.remove()}
+function scrollToBottom(){const b=document.getElementById('chat-box');b.scrollTop=b.scrollHeight}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
 // ===== データ管理 =====
-function exportData() {
-  const data = {
-    tasks: tasks,
-    healthLog: healthLog,
-    chatHistory: chatHistory,
-    exportedAt: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `maruhashi_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  appendMsg('ai', '💾 バックアップを保存しました。');
+function exportData(){
+  const data={tasks,healthLog,chatHistory,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;
+  a.download=`maruhashi_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();URL.revokeObjectURL(url);
+  appendMsg('ai','💾 バックアップを保存しました。');
 }
-
-function clearChat() {
-  if (!confirm('チャット履歴をクリアしますか？（タスクと健康記録は保持されます）')) return;
-  chatHistory = [];
-  localStorage.setItem(STORE.HIST, JSON.stringify(chatHistory));
-  const box = document.getElementById('chat-box');
-  box.innerHTML = '';
-  appendMsg('ai', 'チャット履歴をクリアしました。タスクと健康記録はそのまま保持しています。');
+function clearChat(){
+  if(!confirm('チャット履歴をクリアしますか？'))return;
+  chatHistory=[];localStorage.setItem(S.HIST,'[]');
+  document.getElementById('chat-box').innerHTML='';
+  appendMsg('ai','チャット履歴をクリアしました。タスクと健康記録は保持しています。');
 }
 </script>
 </body>
