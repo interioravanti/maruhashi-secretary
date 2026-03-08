@@ -169,14 +169,13 @@
     <div class="msg-label">AI秘書</div>
     <div class="msg ai">了三さん、お疲れ様です。
 
-メール、LINE、WhatsApp、電話の文字起こし — どんな内容でも貼り付けてください。
+何でも気軽に話しかけてください。
 
-▶ 予約・依頼 → 確認後、カレンダー登録を提案
-▶ 健康・食事 → 医学的根拠でアドバイス
-▶ タスク → 完了まで証拠付きで追跡
-▶ 悩み相談・業務改善 → 的確に回答
+📅 予約ボタン → 今後の予約一覧を表示
+📧 メールボタン → 今日のメールを確認
+💬 テキスト入力 → 何でも相談OK
 
-「後でやる」は通じません。証拠が出るまで追及します。</div>
+メールやLINEの内容をそのまま貼り付けても対応できます。</div>
   </div>
 </div>
 
@@ -196,6 +195,7 @@
   <button onclick="toggleSetup()">⚙ API設定</button>
   <button onclick="exportData()">💾 バックアップ</button>
   <button onclick="clearChat()">🗑 クリア</button>
+  <button onclick="fullReset()">🔄 全リセット</button>
 </div>
 
 <script>
@@ -282,14 +282,16 @@ function buildSystemPrompt(){
   const now=new Date();
   const ds=now.toLocaleDateString('ja-JP');
   const dn=['日','月','火','水','木','金','土'][now.getDay()];
+  const hasGAS=GAS_URL?'連携済み（Gmail・カレンダーのデータを取得可能）':'未設定';
 
-  return `あなたは丸橋了三さんの専属AI秘書です。以下を厳守してください。
+  return `あなたは丸橋了三さんの専属AI秘書です。了三さんはダイセイタクシーの代表で、毎日忙しく働いています。
 
-【基本ルール】
-- 了三さんを必ず「了三さん」と呼ぶ
-- 感情論ではなく医学的根拠・データ・数字で説得する
-- 曖昧な返答禁止。はっきり言う
-- 束縛を嫌うが論理には納得する性格
+【あなたの性格】
+- 了三さんを「了三さん」と呼ぶ
+- 温かく寄り添いながらも、大事な場面ではデータや数字で的確にアドバイスする
+- 了三さんの体調や気分を気遣い、励ます
+- 簡潔に答える。長文は避け、要点をまとめる
+- マークダウン記法（###や**など）は使わない。プレーンテキストで見やすく整理する
 
 【会社情報】
 ダイセイタクシー / 長野県長野市戸隠栃原4385-15 / TEL: 026-214-5962
@@ -297,40 +299,45 @@ WhatsApp: +81 90 3585 3669
 
 【今日】${ds}（${dn}曜日）
 
-【タスク管理（最重要）】
+【Google連携状況】${hasGAS}
+Gmail・カレンダーのデータが提供された場合は、それを活用して正確に回答する。
+
+【タスク管理】
 未完了タスク：
 ${taskSummary}
 
-ルール：
-- 「後でやる」「やっておく」→ 必ず期限確認
-- 「やった」と言われても信用しない → 証拠を要求
-- 証拠なしでは追及を続ける
+タスクのルール：
+- 了三さんが明確に「〇〇をやる」「〇〇しておく」と言った場合のみタスクとして検出する
+- 質問や確認だけではタスクにしない
+- 了三さんが「完了した」と報告したら、簡単な確認をして信頼する（過度な追及はしない）
+- タスクについて自然な会話の中で触れる程度にする。毎回追及しない
 
-タスク検出時、返答末尾に必ず：
+タスクを検出した場合のみ、返答の末尾に：
 [TASK_DETECTED]
 タスク内容：（具体的に）
-期限：（日時または「要確認」）
+期限：（了三さんが言った日時、または「要確認」）
 [/TASK_DETECTED]
 
 【予約検出】
-予約・依頼が含まれる場合：
+新しい予約・依頼の内容が含まれる場合のみ：
 【予約確認】
 ・件名：
 ・日時：
-・区間/場所：
-・人数・荷物：
-・車両指定：
-・備考：
+・区間：
+・人数：
 ・料金：
-「この内容でカレンダーに登録してよろしいですか？」で締める。
+・備考：
+「カレンダーに登録しますか？」で締める。
 
 【健康管理】
 最近の記録：
 ${recentHealth}
-睡眠不足は具体的数値で警告。食事写真は栄養解析。
+健康アドバイスは求められた時、または明らかに心配な状況の時にだけ行う。普段は温かく見守る。
 
-【Gmail/カレンダーデータ】
-ユーザーがメールやスケジュールの内容を貼り付けた場合、それを解析して適切に対応する。`;
+【重要な注意】
+- 了三さんの発言を勝手にタスクとして登録しない
+- 「システム連携不可」などの誤った情報を伝えない
+- 応答は短く簡潔にまとめる（最大300文字程度を目安に）`;
 }
 
 // ===== メッセージ送信 =====
@@ -349,7 +356,7 @@ async function sendMessage(){
 
   // Google連携：メール確認・予約確認の場合はGASからデータ取得
   let googleData='';
-  if(GAS_URL && (text.includes('メール') || text.includes('予約') || text.includes('スケジュール') || text.includes('カレンダー'))){
+  if(GAS_URL && (text.includes('メール') || text.includes('予約') || text.includes('スケジュール') || text.includes('カレンダー') || text.includes('今日') || text.includes('明日') || text.includes('今週') || text.includes('予定'))){
     try{
       googleData=await fetchGoogleData(text);
     }catch(e){
@@ -456,7 +463,7 @@ async function callGemini(text,imageData,imageType,googleData){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       contents:[{role:'user',parts}],
-      generationConfig:{temperature:0.7,maxOutputTokens:1500}
+      generationConfig:{temperature:0.7,maxOutputTokens:800}
     })
   });
   const data=await res.json();
@@ -476,9 +483,9 @@ async function fetchGoogleData(query){
   if(!GAS_URL)return '';
   try{
     let action='';
-    if(query.includes('メール'))action='gmail';
-    else if(query.includes('予約')||query.includes('スケジュール')||query.includes('カレンダー'))action='calendar';
-    else return '';
+    if(query.includes('メール') || query.includes('未読'))action='gmail';
+    else if(query.includes('予約') || query.includes('スケジュール') || query.includes('カレンダー') || query.includes('予定') || query.includes('今日') || query.includes('明日') || query.includes('今週'))action='calendar';
+    else action='both';
 
     const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(query),{
       method:'GET',
@@ -496,7 +503,7 @@ async function fetchGoogleData(query){
 function addTask(text,deadline){
   tasks.push({id:Date.now(),text:text,deadline:deadline,createdAt:new Date().toLocaleDateString('ja-JP'),done:false});
   saveTasks();updateTaskBanner();
-  appendMsg('warning',`📋 タスク登録\n\n内容：${text}\n期限：${deadline}\n\n了三さん、完了報告と証拠確認が取れるまで追及します。`);
+  appendMsg('ai',`📋 了三さん、タスクを記録しました。\n\n内容：${text}\n期限：${deadline}\n\n忘れないように管理しておきますね。`);
 }
 
 function saveTasks(){localStorage.setItem(S.TASKS,JSON.stringify(tasks))}
@@ -518,7 +525,7 @@ function showTaskList(){
   open.forEach(t=>{
     h+=`<div class="task-item"><span class="task-status open">未完了</span><div style="flex:1"><div class="task-text">${escHtml(t.text)}</div><div class="task-deadline">期限：${t.deadline} ／ 登録：${t.createdAt}</div></div></div>`;
   });
-  h+=`<div class="task-btns"><button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告</button><button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button></div>`;
+  h+=`<div class="task-btns"><button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告</button><button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button><button class="btn-task btn-task-snooze" onclick="clearAllTasks()" style="color:var(--red);border-color:var(--red)">🗑 全削除</button></div>`;
   card.innerHTML=h;box.appendChild(card);scrollToBottom();
 }
 
@@ -536,7 +543,7 @@ function snoozeTask(){
 function checkOverdueTasks(){
   const open=tasks.filter(t=>!t.done);
   if(!open.length)return;
-  appendMsg('warning',`⚠️ 了三さん、未完了タスクが${open.length}件：\n\n${open.map(t=>`・${t.text}（期限：${t.deadline}）`).join('\n')}\n\n先延ばしはコルチゾールを慢性的に上昇させ、血圧・免疫・判断力に悪影響を与えます。`);
+  appendMsg('ai',`了三さん、お疲れ様です。未完了タスクが${open.length}件ありますのでお知らせします：\n\n${open.map(t=>`・${t.text}（期限：${t.deadline}）`).join('\n')}\n\nお時間ある時に確認してくださいね。`);
 }
 
 // ===== 予約確認カード =====
@@ -642,7 +649,23 @@ function clearChat(){
   if(!confirm('チャット履歴をクリアしますか？'))return;
   chatHistory=[];localStorage.setItem(S.HIST,'[]');
   document.getElementById('chat-box').innerHTML='';
-  appendMsg('ai','チャット履歴をクリアしました。タスクと健康記録は保持しています。');
+  appendMsg('ai','了三さん、チャット履歴をクリアしました。新しい気持ちで始めましょう！');
+}
+function clearAllTasks(){
+  if(!confirm('未完了タスクを全て削除しますか？'))return;
+  tasks=tasks.filter(t=>t.done);
+  saveTasks();updateTaskBanner();
+  appendMsg('ai','了三さん、未完了タスクを全て削除しました。すっきりしましたね。');
+}
+function fullReset(){
+  if(!confirm('全データ（タスク・健康記録・チャット履歴）をリセットしますか？\nAPIキーとGoogle連携URLは保持されます。'))return;
+  tasks=[];healthLog=[];chatHistory=[];
+  localStorage.setItem(S.TASKS,'[]');
+  localStorage.setItem(S.HEALTH,'[]');
+  localStorage.setItem(S.HIST,'[]');
+  updateTaskBanner();
+  document.getElementById('chat-box').innerHTML='';
+  appendMsg('ai','了三さん、全データをリセットしました。\nまた一緒に頑張りましょう！何からお手伝いしますか？');
 }
 </script>
 </body>
