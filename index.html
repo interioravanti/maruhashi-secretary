@@ -460,9 +460,9 @@ async function callGemini(text,imageData,imageType,googleData){
   if(imageData) parts.push({inline_data:{mime_type:imageType,data:imageData}});
   let userText=text||'（ファイルを確認してください）';
   if(googleData){
-    // Geminiの入力が大きすぎると応答が途切れるため、データを制限
+    // Geminiの入力が大きすぎると応答が途切れるため、データを厳しく制限
     let trimmedData=googleData;
-    if(trimmedData.length>3000) trimmedData=trimmedData.substring(0,3000)+'\n\n（以降省略。データが多いため、上記の範囲で回答してください）';
+    if(trimmedData.length>2000) trimmedData=trimmedData.substring(0,2000)+'\n（以降省略）';
     userText+='\n\n【Gmail・カレンダーから取得したデータ】\n'+trimmedData;
   }
   parts.push({text:buildSystemPrompt()+'\n\n了三さんの入力：'+userText});
@@ -493,11 +493,27 @@ async function fetchGoogleData(query){
   if(!GAS_URL)return '';
   try{
     let action='';
-    if(query.includes('メール') || query.includes('未読'))action='gmail';
-    else if(query.includes('予約') || query.includes('スケジュール') || query.includes('カレンダー') || query.includes('予定') || query.includes('今日') || query.includes('明日') || query.includes('今週'))action='calendar';
-    else action='both';
+    let gasQuery=query;
 
-    const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(query),{
+    if(query.includes('メール') || query.includes('未読')){
+      action='gmail';
+    } else {
+      action='calendar';
+      // GASに正しいキーワードを渡して取得範囲を制限
+      if(query.includes('今日だけ') || (query.includes('今日') && !query.includes('今週'))){
+        gasQuery='今日だけ';
+      } else if(query.includes('明日')){
+        gasQuery='明日';
+      } else if(query.includes('今週')){
+        gasQuery='今週';
+      } else if(query.includes('今月')){
+        gasQuery='今月';
+      }
+      // 「予約」「予定」「スケジュール」はデフォルト（90日）→GASでは重いので今週に制限
+      if(gasQuery===query && !query.includes('全')) gasQuery='今週';
+    }
+
+    const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(gasQuery),{
       method:'GET',
       mode:'cors'
     });
@@ -596,7 +612,7 @@ function quickAction(type){
     const r=healthLog.slice(-8).map(l=>`${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`).join('\n');
     msg=`健康チェックをお願いします。\n\n【最近の記録】\n${r||'記録なし'}`;
   }else if(type==='予約確認'){
-    msg='本日の予約と今週の予定をまとめてください。';
+    msg='今日と今週の予定を教えてください。';
   }else if(type==='メール確認'){
     msg='今日の重要なメールを確認して、対応が必要なものを教えてください。';
   }
