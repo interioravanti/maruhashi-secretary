@@ -282,11 +282,26 @@ ${taskSummary}
 【最近の健康記録】
 ${recentHealth}
 
-【タスク検出】了三さんが明確に「〇〇をやる」と言った場合のみ返答末尾に付ける：
+【タスク検出ルール】
+以下のケースでタスクを検出して返答末尾に付ける：
+1. 了三さんが「〇〇をやる」「〇〇しておく」「〇〇を送る」と言った場合
+2. メールの内容から「返信が必要」「対応が必要」「期限がある」ものを見つけた場合
+3. 「返信待ち」「確認待ち」など相手からの返答を待っている場合
+4. 予約・送迎依頼でカレンダー未登録のものを見つけた場合
+
+優先度の判断基準：
+- 高：当日・翌日期限、お金に関わる、お客様への返信
+- 中：3日以内、予約・手配関連
+- 低：1週間以上先、確認・検討事項
+
 [TASK_DETECTED]
-タスク内容：（具体的に）
+タスク内容：（具体的に、誰に・何を・どうする）
 期限：（日時か「要確認」）
+優先度：（高・中・低）
+種別：（返信必要・手配・確認・請求・その他）
 [/TASK_DETECTED]
+
+複数タスクがある場合は [TASK_DETECTED]〜[/TASK_DETECTED] を複数付ける。
 
 【予約検出】新しい予約内容がある場合のみ：
 【予約確認】
@@ -311,6 +326,10 @@ async function sendMessage(){
   if(GAS_URL&&(text.includes('メール')||text.includes('予約')||text.includes('スケジュール')||text.includes('カレンダー')||text.includes('今日')||text.includes('明日')||text.includes('今週')||text.includes('予定'))){
     try{googleData=await fetchGoogleData(text);}catch(e){console.warn('Google連携エラー:',e);}
   }
+  // 予約・スケジュール確認は突き合わせ機能を使う
+  if(GAS_URL&&(text.includes('予約確認')||text.includes('スケジュール確認')||text.includes('カレンダー未登録')||text.includes('漏れ')||text.includes('正確な予定'))){
+    try{googleData=await fetchGoogleData(text,'check');}catch(e){console.warn('Google連携エラー:',e);}
+  }
 
   document.getElementById('send-btn').disabled=true;
   const typing=showTyping();
@@ -319,17 +338,19 @@ async function sendMessage(){
     const reply=API_TYPE==='claude'?await callClaude(text,imgData,imgType,googleData):await callGemini(text,imgData,imgType,googleData);
     removeTyping(typing);
 
-    const taskMatch=reply.match(/\[TASK_DETECTED\]([\s\S]*?)\[\/TASK_DETECTED\]/);
+    const taskMatches=[...reply.matchAll(/\[TASK_DETECTED\]([\s\S]*?)\[\/TASK_DETECTED\]/g)];
     const cleanReply=reply.replace(/\[TASK_DETECTED\][\s\S]*?\[\/TASK_DETECTED\]/g,'').trim();
 
     appendMsg('ai',cleanReply);
 
-    if(taskMatch){
-      const info=taskMatch[1].trim();
+    taskMatches.forEach(m=>{
+      const info=m[1].trim();
       const tt=(info.match(/タスク内容[：:](.+)/)||[])[1]||info;
       const dl=(info.match(/期限[：:](.+)/)||[])[1]||'要確認';
-      addTask(tt.trim(),dl.trim());
-    }
+      const pr=(info.match(/優先度[：:](.+)/)||[])[1]||'中';
+      const tp=(info.match(/種別[：:](.+)/)||[])[1]||'その他';
+      addTask(tt.trim(),dl.trim(),pr.trim(),tp.trim());
+    });
     if(cleanReply.includes('【予約確認】'))showConfirmCard();
 
     // ★修正②: 履歴は直近12件（6往復）のみ
@@ -444,17 +465,24 @@ async function callGemini(text,imageData,imageType,googleData){
   throw new Error('エラー（'+(c||res.status)+'）: '+m);
 }
 
-async function fetchGoogleData(query){
+async function fetchGoogleData(query, forceAction){
   if(!GAS_URL)return '';
   try{
     let action='',gasQuery='今週';
-    if(query.includes('メール')||query.includes('未読')){action='gmail';}
-    else{
+
+    if(forceAction){
+      // 強制アクション指定（突き合わせなど）
+      action=forceAction;
+      gasQuery=query;
+    } else if(query.includes('メール')||query.includes('未読')){
+      action='gmail';
+    } else {
       action='calendar';
       if(query.includes('今日')&&!query.includes('今週')) gasQuery='今日だけ';
       else if(query.includes('明日')) gasQuery='明日';
       else if(query.includes('今月')) gasQuery='今月';
     }
+
     const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(gasQuery),{method:'GET',mode:'cors'});
     const data=await res.json();
     if(data.error)return '（Google連携エラー: '+data.error+'）';
@@ -462,10 +490,21 @@ async function fetchGoogleData(query){
   }catch(e){return '（Google連携に接続できませんでした）';}
 }
 
-function addTask(text,deadline){
-  tasks.push({id:Date.now(),text,deadline,createdAt:new Date().toLocaleDateString('ja-JP'),done:false});
+function addTask(text,deadline,priority,type){
+  priority=priority||'中';
+  type=type||'その他';
+  tasks.push({
+    id:Date.now(),
+    text,
+    deadline,
+    priority,
+    type,
+    createdAt:new Date().toLocaleDateString('ja-JP'),
+    done:false
+  });
   saveTasks();updateTaskBanner();
-  appendMsg('ai',`📋 タスクを記録しました。\n\n内容：${text}\n期限：${deadline}`);
+  const icon=priority==='高'?'🔴':priority==='中'?'🟡':'🟢';
+  appendMsg('ai',`📋 タスクを記録しました。\n\n${icon} ${text}\n期限：${deadline}\n優先度：${priority}　種別：${type}`);
 }
 function saveTasks(){localStorage.setItem(S.TASKS,JSON.stringify(tasks))}
 function updateTaskBanner(){
@@ -476,12 +515,54 @@ function updateTaskBanner(){
 }
 function showTaskList(){
   const open=tasks.filter(t=>!t.done);
-  if(!open.length){appendMsg('ai','了三さん、未完了タスクはゼロです。素晴らしい。');return}
+  if(!open.length){appendMsg('ai','了三さん、未完了タスクはゼロです。素晴らしい！');return}
+
+  // 優先度順にソート（高→中→低）
+  const order={'高':0,'中':1,'低':2};
+  const sorted=[...open].sort((a,b)=>(order[a.priority||'中']||1)-(order[b.priority||'中']||1));
+
+  // 期限切れチェック
+  const today=new Date();
+  today.setHours(0,0,0,0);
+
   const box=document.getElementById('chat-box');
   const card=document.createElement('div');card.className='task-card';
+
+  const high=sorted.filter(t=>t.priority==='高');
+  const mid=sorted.filter(t=>t.priority==='中'||!t.priority);
+  const low=sorted.filter(t=>t.priority==='低');
+
   let h=`<h4>📋 未完了タスク（${open.length}件）</h4>`;
-  open.forEach(t=>{h+=`<div class="task-item"><span class="task-status open">未完了</span><div style="flex:1"><div class="task-text">${escHtml(t.text)}</div><div class="task-deadline">期限：${t.deadline} ／ 登録：${t.createdAt}</div></div></div>`;});
-  h+=`<div class="task-btns"><button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告</button><button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button><button class="btn-task btn-task-snooze" onclick="clearAllTasks()" style="color:var(--red);border-color:var(--red)">🗑 全削除</button></div>`;
+
+  const renderGroup=(items,label,color)=>{
+    if(!items.length)return '';
+    let g=`<div style="font-size:0.65rem;color:${color};margin:8px 0 4px;font-weight:600;">${label}（${items.length}件）</div>`;
+    items.forEach(t=>{
+      const isOverdue=t.deadline&&t.deadline!=='要確認'&&new Date(t.deadline)<today;
+      const icon=t.priority==='高'?'🔴':t.priority==='低'?'🟢':'🟡';
+      const typeLabel=t.type?`[${t.type}]`:'';
+      g+=`<div class="task-item">
+        <div style="flex:1">
+          <div class="task-text">${icon} ${escHtml(t.text)} <span style="font-size:0.62rem;color:var(--text-dim)">${typeLabel}</span></div>
+          <div class="task-deadline" style="${isOverdue?'color:var(--red);font-weight:600;':''}">
+            ${isOverdue?'⚠️ 期限切れ：':'期限：'}${t.deadline} ／ 登録：${t.createdAt}
+          </div>
+        </div>
+      </div>`;
+    });
+    return g;
+  };
+
+  h+=renderGroup(high,'🔴 優先度：高','#e74c3c');
+  h+=renderGroup(mid,'🟡 優先度：中','#e67e22');
+  h+=renderGroup(low,'🟢 優先度：低','#27ae60');
+
+  h+=`<div class="task-btns">
+    <button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告</button>
+    <button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button>
+    <button class="btn-task btn-task-snooze" onclick="clearAllTasks()" style="color:var(--red);border-color:var(--red)">🗑 全削除</button>
+  </div>`;
+
   card.innerHTML=h;box.appendChild(card);scrollToBottom();
 }
 function requestTaskProof(){
@@ -497,7 +578,39 @@ function snoozeTask(){
 function checkOverdueTasks(){
   const open=tasks.filter(t=>!t.done);
   if(!open.length)return;
-  appendMsg('ai',`了三さん、未完了タスクが${open.length}件あります：\n\n${open.slice(0,5).map(t=>`・${t.text}（期限：${t.deadline}）`).join('\n')}\n\nお時間ある時に確認してくださいね。`);
+
+  const today=new Date();today.setHours(0,0,0,0);
+  const tomorrow=new Date(today);tomorrow.setDate(tomorrow.getDate()+1);
+
+  const overdue=open.filter(t=>t.deadline&&t.deadline!=='要確認'&&new Date(t.deadline)<today);
+  const dueToday=open.filter(t=>t.deadline&&new Date(t.deadline).toDateString()===today.toDateString());
+  const dueTomorrow=open.filter(t=>t.deadline&&new Date(t.deadline).toDateString()===tomorrow.toDateString());
+  const high=open.filter(t=>t.priority==='高');
+
+  let msg='了三さん、タスクの状況をお知らせします。\n\n';
+
+  if(overdue.length){
+    msg+=`🔴 期限切れ（${overdue.length}件）：\n`;
+    msg+=overdue.map(t=>`・${t.text}（${t.deadline}）`).join('\n');
+    msg+='\n\n';
+  }
+  if(dueToday.length){
+    msg+=`⚡ 本日期限（${dueToday.length}件）：\n`;
+    msg+=dueToday.map(t=>`・${t.text}`).join('\n');
+    msg+='\n\n';
+  }
+  if(dueTomorrow.length){
+    msg+=`📅 明日期限（${dueTomorrow.length}件）：\n`;
+    msg+=dueTomorrow.map(t=>`・${t.text}`).join('\n');
+    msg+='\n\n';
+  }
+  if(!overdue.length&&!dueToday.length&&!dueTomorrow.length){
+    msg+=`未完了タスクが${open.length}件あります。\n`;
+    msg+=open.slice(0,3).map(t=>`・${t.priority==='高'?'🔴':'🟡'} ${t.text}`).join('\n');
+  }
+
+  msg+='\n📋 タスクボタンで一覧を確認してください。';
+  appendMsg('ai',msg);
 }
 function showConfirmCard(){
   const box=document.getElementById('chat-box');
@@ -526,7 +639,7 @@ function quickAction(type){
   else if(type==='健康チェック'){
     const r=healthLog.slice(-4).map(l=>`${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`).join('\n');
     msg=`健康チェックをお願いします。\n\n【最近の記録】\n${r||'記録なし'}`;
-  }else if(type==='予約確認'){msg='今日と今週の予定を教えてください。';}
+  }else if(type==='予約確認'){msg='正確な予定を確認してください。メールとカレンダーを突き合わせて、未登録の予約があれば教えてください。';}
   else if(type==='メール確認'){msg='今日の重要なメールを確認して、対応が必要なものを教えてください。';}
   document.getElementById('user-input').value=msg;
   document.getElementById('user-input').focus();
