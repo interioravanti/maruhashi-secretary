@@ -27,7 +27,6 @@
     .status-label{font-size:0.6rem;color:var(--text-dim)}
     #task-banner{display:none;background:var(--orange-bg);border-bottom:1px solid rgba(230,126,34,0.3);padding:8px 16px;flex-shrink:0;cursor:pointer;transition:all .2s}
     #task-banner.visible{display:flex;align-items:center;gap:10px}
-    #task-banner:hover{background:#1f1200}
     .banner-text{font-size:0.72rem;color:var(--orange);flex:1}
     .banner-count{background:var(--orange);color:#000;border-radius:10px;padding:2px 9px;font-size:0.65rem;font-weight:700}
     #setup-panel{display:none;background:linear-gradient(180deg,var(--surface2),var(--surface));border-bottom:1px solid var(--gold-dim);padding:16px 18px;flex-direction:column;gap:10px;flex-shrink:0}
@@ -36,73 +35,25 @@
     .setup-row{display:flex;gap:8px}
     .setup-input{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:0.82rem;font-family:monospace;outline:none;transition:border .2s}
     .setup-input:focus{border-color:var(--gold)}
-    .btn-save{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s}
-    .btn-save:hover{box-shadow:0 2px 12px rgba(201,168,76,0.4)}
-    .setup-hint{font-size:0.65rem;color:var(--text-dim)}
-    .setup-hint a{color:var(--gold-dim);text-decoration:none}
-    .setup-hint a:hover{text-decoration:underline}
-    .quick-bar{display:flex;gap:6px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
-    .quick-bar::-webkit-scrollbar{display:none}
-    .q-btn{background:var(--surface3);border:1px solid var(--border);color:var(--text-dim);padding:5px 12px;border-radius:20px;font-size:0.68rem;cursor:pointer;white-space:nowrap;font-family:'Noto Sans JP',sans-serif;transition:all .15s}
-    .q-btn:hover{border-color:var(--gold-dim);color:var(--gold-light);background:rgba(201,168,76,0.08)}
-    .q-btn.alert{border-color:var(--orange);color:var(--orange)}
-    .q-btn.alert:hover{background:rgba(230,126,34,0.1)}
-    #chat-box{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
-    #chat-box::-webkit-scrollbar{width:3px}
-    #chat-box::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-    .msg-wrap{display:flex;flex-direction:column;max-width:88%;animation:fadeUp .25s ease}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .btn-save{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer}
+    .quick-bar{display:flex;gap:6px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
+    .q-btn{background:var(--surface3);border:1px solid var(--border);color:var(--text-dim);padding:5px 12px;border-radius:20px;font-size:0.68rem;cursor:pointer;white-space:nowrap}
+    #chat-box{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:16px}
+    .msg-wrap{display:flex;flex-direction:column;max-width:90%;animation:fadeUp .2s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
     .msg-wrap.user{align-self:flex-end;align-items:flex-end}
     .msg-wrap.ai{align-self:flex-start;align-items:flex-start}
-    .msg-label{font-size:0.58rem;color:var(--text-dim);margin-bottom:3px;letter-spacing:0.03em}
-    .msg{padding:12px 16px;border-radius:14px;font-size:0.84rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
-    .msg.user{background:linear-gradient(135deg,var(--gold-dim),#5a4520);color:#f5edd5;border-bottom-right-radius:4px}
-    .msg.ai{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px}
-    .msg.error{background:var(--red-bg);border:1px solid rgba(192,57,43,0.3);color:#e08080}
-    .msg.warning{background:var(--orange-bg);border:1px solid rgba(230,126,34,0.3);color:#f0a060}
-    .task-card{background:var(--surface);border:1px solid var(--gold-dim);border-radius:12px;padding:16px;margin-top:8px;max-width:440px;animation:fadeUp .3s ease}
-    .task-card h4{font-size:0.78rem;color:var(--gold);margin-bottom:12px;font-family:'Cormorant Garamond',serif;font-weight:700;letter-spacing:0.05em}
-    .task-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.76rem}
-    .task-item:last-of-type{border-bottom:none}
-    .task-status{font-size:0.62rem;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:2px}
-    .task-status.open{background:rgba(230,126,34,0.1);color:var(--orange);border:1px solid rgba(230,126,34,0.3)}
-    .task-text{flex:1;color:var(--text)}
-    .task-deadline{font-size:0.6rem;color:var(--text-dim);margin-top:2px}
-    .task-btns{display:flex;gap:8px;margin-top:12px}
-    .btn-task{flex:1;background:transparent;padding:8px;border-radius:8px;font-size:0.74rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s}
-    .btn-task-done{border:1px solid var(--green);color:var(--green)}
-    .btn-task-done:hover{background:rgba(46,204,113,0.1)}
-    .btn-task-snooze{border:1px solid var(--border);color:var(--text-dim)}
-    .confirm-card{background:var(--surface);border:1px solid var(--gold-dim);border-radius:12px;padding:16px;margin-top:8px;max-width:440px;animation:fadeUp .3s ease}
-    .confirm-card h4{font-size:0.78rem;color:var(--gold);margin-bottom:10px;font-family:'Cormorant Garamond',serif;font-weight:700}
-    .confirm-btns{display:flex;gap:8px;margin-top:12px}
-    .btn-register{flex:1;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;padding:10px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
-    .btn-cancel{flex:1;background:transparent;color:var(--text-dim);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
-    .typing{display:flex;gap:5px;padding:14px 16px;align-items:center}
-    .typing span{width:6px;height:6px;border-radius:50%;background:var(--gold-dim);animation:bounce 1.2s infinite}
-    .typing span:nth-child(2){animation-delay:.2s}
-    .typing span:nth-child(3){animation-delay:.4s}
-    @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
-    #input-area{display:flex;align-items:flex-end;padding:12px 14px;background:var(--surface);border-top:1px solid var(--border);gap:8px;flex-shrink:0}
-    .pending-badge{font-size:0.68rem;color:var(--gold);padding:4px 10px;background:var(--surface3);border-radius:8px;white-space:nowrap;border:1px solid var(--gold-dim);margin-bottom:4px}
-    #user-input{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:12px;font-size:0.85rem;font-family:'Noto Sans JP',sans-serif;outline:none;resize:none;max-height:120px;min-height:44px;line-height:1.5;transition:border .2s}
-    #user-input:focus{border-color:var(--gold-dim)}
-    #user-input::placeholder{color:var(--text-dim)}
-    .input-btns{display:flex;flex-direction:column;gap:6px}
-    #image-input{display:none}
-    .btn-attach{background:var(--surface3);border:1px solid var(--border);color:var(--text-dim);width:40px;height:40px;border-radius:10px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-    .btn-attach:hover{border-color:var(--gold-dim);color:var(--gold)}
-    #send-btn{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;width:40px;height:40px;border-radius:10px;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .2s}
-    #send-btn:hover{box-shadow:0 2px 12px rgba(201,168,76,0.4)}
-    #send-btn:disabled{opacity:.4;cursor:not-allowed}
-    .footer{text-align:center;font-size:0.6rem;color:var(--text-dim);padding:4px;background:var(--dark);flex-shrink:0;display:flex;justify-content:center;gap:16px}
-    .footer button{background:none;border:none;color:var(--gold-dim);font-size:0.6rem;cursor:pointer;text-decoration:underline;font-family:'Noto Sans JP',sans-serif}
-    .g-banner{background:linear-gradient(135deg,#1a237e,#0d47a1);border-bottom:1px solid #1565c0;padding:8px 16px;display:none;align-items:center;gap:10px;flex-shrink:0;cursor:pointer}
-    .g-banner.visible{display:flex}
-    .g-banner-text{font-size:0.7rem;color:#90caf9;flex:1}
-    .g-banner-btn{background:#1565c0;color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:0.65rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
-    @media(max-width:480px){.h-title{font-size:0.82rem}.msg{font-size:0.82rem;padding:10px 13px}.q-btn{font-size:0.65rem;padding:4px 10px}}
-    @media print{body{display:none!important}}
+    .msg-label{font-size:0.6rem;color:var(--text-dim);margin-bottom:3px}
+    .msg{padding:12px 16px;border-radius:14px;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+    .msg.user{background:linear-gradient(135deg,var(--gold-dim),#5a4520);color:#fff}
+    .msg.ai{background:var(--surface2);border:1px solid var(--border)}
+    .msg.error{color:var(--red)}
+    #input-area{display:flex;align-items:flex-end;padding:12px 14px;background:var(--surface);border-top:1px solid var(--border);gap:8px}
+    #user-input{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:12px;font-size:0.85rem;outline:none;resize:none;max-height:120px}
+    #send-btn{background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;width:44px;height:44px;border-radius:10px;font-size:1.2rem;cursor:pointer}
+    .footer{text-align:center;font-size:0.6rem;color:var(--text-dim);padding:8px;background:var(--dark);display:flex;justify-content:center;gap:15px}
+    .footer button{background:none;border:none;color:var(--gold-dim);text-decoration:underline;cursor:pointer}
+    .typing{padding:10px;font-style:italic;font-size:0.7rem;color:var(--gold-dim)}
   </style>
 </head>
 <body>
@@ -112,352 +63,201 @@
     <div class="h-icon">🚖</div>
     <div>
       <div class="h-title">MARUHASHI AI SECRETARY</div>
-      <div class="h-sub">丸橋了三さん 専属 ／ 業務・健康・タスク管理</div>
+      <div class="h-sub">丸橋了三さん 専属秘書</div>
     </div>
   </div>
   <div class="h-right">
-    <span class="status-label" id="status-label">確認中</span>
+    <span class="status-label" id="status-label">待機中</span>
     <div class="status-dot" id="status-dot"></div>
   </div>
 </header>
 
 <div id="task-banner" onclick="showTaskList()">
-  <span>⚡</span>
-  <span class="banner-text">未完了タスクがあります</span>
-  <span class="banner-count" id="task-count-badge">0件</span>
-</div>
-
-<div class="g-banner" id="g-banner">
-  <span style="font-size:1rem">📧</span>
-  <span class="g-banner-text" id="g-banner-text">Gmail・カレンダー連携が利用可能です</span>
-  <button class="g-banner-btn" onclick="toggleSetup()">設定</button>
+  <span class="banner-text">📌 未完了タスクがあります</span>
+  <span class="banner-count" id="task-count-badge">0</span>
 </div>
 
 <div id="setup-panel">
-  <div class="setup-label">🔑 API設定</div>
-  <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px">AIキー（Claude または Gemini）</div>
-  <div class="setup-row">
-    <input type="password" class="setup-input" id="api-key-input" placeholder="sk-ant-... または AIzaSy...">
-    <button class="btn-save" onclick="saveApiKey()">保存</button>
-  </div>
-  <p class="setup-hint">Claude: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> ／ Gemini: <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></p>
-
-  <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
-    <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px">📧 Google連携URL（オプション）</div>
-    <div class="setup-row">
-      <input type="text" class="setup-input" id="gas-url-input" placeholder="Google Apps Script のデプロイURL">
-      <button class="btn-save" onclick="saveGasUrl()" style="background:var(--blue);font-size:0.75rem;padding:10px 14px">保存</button>
-    </div>
-  </div>
+  <div class="setup-label">🔑 設定</div>
+  <input type="password" class="setup-input" id="api-key-input" placeholder="Gemini または Claude のAPIキー">
+  <input type="text" class="setup-input" id="gas-url-input" placeholder="GAS URL (Google連携)">
+  <button class="btn-save" onclick="saveSettings()">設定を保存してリロード</button>
 </div>
 
 <div class="quick-bar">
+  <button class="q-btn" onclick="quickAction('予約確認')">📅 予定確認</button>
+  <button class="q-btn" onclick="quickAction('メール確認')">📧 メール確認</button>
   <button class="q-btn" onclick="quickAction('起床')">☀️ 起床</button>
   <button class="q-btn" onclick="quickAction('就寝')">🌙 就寝</button>
   <button class="q-btn" onclick="quickAction('食事')">🍱 食事</button>
-  <button class="q-btn" onclick="quickAction('健康チェック')">💓 健康</button>
-  <button class="q-btn alert" onclick="showTaskList()">📋 タスク</button>
-  <button class="q-btn" onclick="quickAction('予約確認')">📅 予約</button>
-  <button class="q-btn" onclick="quickAction('メール確認')">📧 メール</button>
 </div>
 
-<div id="chat-box">
-  </div>
+<div id="chat-box"></div>
 
 <div id="input-area">
-  <div style="flex:1;display:flex;flex-direction:column;gap:4px">
-    <div id="pending-badge" class="pending-badge" style="display:none">📎 画像待機中</div>
-    <textarea id="user-input" placeholder="メッセージを入力..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-  </div>
-  <div class="input-btns">
-    <label for="image-input" class="btn-attach" title="写真・PDFを送る">📎</label>
-    <input type="file" id="image-input" accept="image/*,application/pdf" onchange="handleFile(event)">
-    <button id="send-btn" onclick="sendMessage()">↑</button>
-  </div>
+  <textarea id="user-input" placeholder="メッセージを入力..." rows="1" onkeydown="handleKey(event)"></textarea>
+  <button id="send-btn" onclick="sendMessage()">↑</button>
 </div>
 
 <div class="footer">
-  <button onclick="toggleSetup()">⚙ API設定</button>
-  <button onclick="exportData()">💾 バックアップ</button>
-  <button onclick="clearChat()">🗑 クリア</button>
+  <button onclick="toggleSetup()">⚙ 設定</button>
+  <button onclick="clearChat()">🗑 履歴消去</button>
   <button onclick="fullReset()">🔄 全リセット</button>
 </div>
 
 <script>
-const S={KEY:'maru_key',TYPE:'maru_type',TASKS:'maru_tasks',HEALTH:'maru_health',HIST:'maru_hist',GAS:'maru_gas'};
+const S={KEY:'maru_key',TYPE:'maru_type',TASKS:'maru_tasks',HIST:'maru_hist',GAS:'maru_gas'};
 let API_KEY=localStorage.getItem(S.KEY)||'';
 let API_TYPE=localStorage.getItem(S.TYPE)||'';
 let GAS_URL=localStorage.getItem(S.GAS)||'';
 let tasks=JSON.parse(localStorage.getItem(S.TASKS)||'[]');
-let healthLog=JSON.parse(localStorage.getItem(S.HEALTH)||'[]');
 let chatHistory=JSON.parse(localStorage.getItem(S.HIST)||'[]');
-let pendingImg=null,pendingImgType='image/jpeg';
 
 window.addEventListener('DOMContentLoaded',()=>{
-  if(chatHistory.length === 0) {
-    appendMsg('ai', "了三さん、お疲れ様です。何でも気軽に話しかけてください。\n\n📅 予約ボタン → 予定一覧を表示\n📧 メールボタン → メールの確認\n💬 入力 → 相談OK");
-  } else {
-    chatHistory.slice(-15).forEach(h => appendMsg(h.role==='assistant'?'ai':'user', h.content, true));
+  if(chatHistory.length===0){
+    appendMsg('ai','了三さん、お疲れ様です。本日の予定やメールの確認、何でもお申し付けください。');
+  }else{
+    chatHistory.slice(-10).forEach(h=>appendMsg(h.role==='assistant'?'ai':'user',h.content,true));
   }
-  
-  if(!API_KEY){
-    document.getElementById('setup-panel').classList.add('visible');
-    setStatus('error','未設定');
-  } else {
-    if(!API_TYPE) API_TYPE=API_KEY.startsWith('sk-ant')?'claude':'gemini';
-    setStatus('online', API_TYPE==='claude'?'Claude接続中':'Gemini接続中');
-    updateTaskBanner();
-    if(GAS_URL) document.getElementById('g-banner').classList.add('visible');
-  }
+  if(!API_KEY) document.getElementById('setup-panel').classList.add('visible');
+  updateTaskBanner();
+  setStatus(API_KEY?'online':'error', API_KEY?'接続中':'キー未設定');
 });
 
-function setStatus(s,label){
-  document.getElementById('status-dot').className='status-dot '+s;
-  document.getElementById('status-label').textContent=label||'';
-}
-
 function buildSystemPrompt(){
-  const openTasks=tasks.filter(t=>!t.done);
-  const taskSummary=openTasks.length>0 ? openTasks.map((t,i)=>`${i+1}. ${t.text}（期限:${t.deadline}）`).join('\n') : 'なし';
-  const now=new Date();
-  return `あなたは丸橋了三さんの専属AI秘書です。了三さんはダイセイタクシーの代表です。
-
-【性格】
+  const taskText = tasks.filter(t=>!t.done).map(t=>`・${t.text}`).join('\n') || 'なし';
+  return `あなたは丸橋了三さんの専属AI秘書です。
+【重要】
 - 了三さんを「了三さん」と呼ぶ。
-- 温かく、誠実で、簡潔な言葉使い。
-- 無理に短くせず、重要な情報は正確に伝える。
-
-【今日の状況】
-日時：${now.toLocaleString('ja-JP')}
-未完了タスク：
-${taskSummary}
-
-【返答のルール】
-- マークダウン記法（###や**など）は絶対に使わない。
-- 予定の一覧など、長くなる場合は「午前」「午後」などで区切り、最後まで出力する。
-- 了三さんが何かを「やる」と言ったら以下の形式で末尾に含める。
-[TASK_DETECTED]
-内容：
-期限：
-[/TASK_DETECTED]`;
+- 丁寧かつ簡潔に。
+- 予定が大量にある場合、まず「今日の予定」と「重要事項」を優先し、最後に「他に必要な情報はありますか？」と聞くこと（一度に長文を出しすぎない）。
+- 箇条書きを使い、見やすくすること。マークダウン（###等）は不要。
+- 今日：${new Date().toLocaleDateString('ja-JP')}
+- 未完了タスク：\n${taskText}
+- タスク登録が必要な時は末尾に [TASK]内容 [/TASK] と書く。`;
 }
 
 async function sendMessage(){
   const input=document.getElementById('user-input');
   const text=input.value.trim();
-  if(!text&&!pendingImg)return;
+  if(!text || !API_KEY) return;
   
-  appendMsg('user',text||'（画像を送信）');
-  input.value=''; autoResize(input);
+  appendMsg('user',text);
+  input.value='';
   
-  const imgData=pendingImg;
-  const imgType=pendingImgType;
-  pendingImg=null;
-  document.getElementById('pending-badge').style.display='none';
-
   let googleData='';
-  if(GAS_URL && (text.includes('予定') || text.includes('予約') || text.includes('メール') || text.includes('スケジュール'))){
+  if(GAS_URL && (text.includes('予定') || text.includes('予約') || text.includes('メール'))){
+    setStatus('online','データ取得中...');
     googleData = await fetchGoogleData(text);
   }
 
-  document.getElementById('send-btn').disabled=true;
   const typing=showTyping();
-
   try{
-    const reply = (API_TYPE==='claude') 
-      ? await callClaude(text, imgData, imgType, googleData) 
-      : await callGemini(text, imgData, imgType, googleData);
-    
+    const reply = await callGemini(text, googleData);
     removeTyping(typing);
-
-    const taskMatch=reply.match(/\[TASK_DETECTED\]([\s\S]*?)\[\/TASK_DETECTED\]/);
-    const cleanReply=reply.replace(/\[TASK_DETECTED\][\s\S]*?\[\/TASK_DETECTED\]/g,'').trim();
+    
+    const cleanReply = reply.replace(/\[TASK\](.*?)\[\/TASK\]/g, (m, p1)=>{
+      addTask(p1.trim()); return '';
+    }).trim();
 
     appendMsg('ai', cleanReply);
-
-    if(taskMatch){
-      const info=taskMatch[1].trim();
-      const tt=(info.match(/内容[：:](.+)/)||[])[1]||'新規タスク';
-      const dl=(info.match(/期限[：:](.+)/)||[])[1]||'要確認';
-      addTask(tt.trim(),dl.trim());
-    }
-
-    chatHistory.push({role:'user',content:text||'（画像送信）'});
-    chatHistory.push({role:'assistant',content:cleanReply});
-    if(chatHistory.length>40)chatHistory=chatHistory.slice(-40);
-    localStorage.setItem(S.HIST,JSON.stringify(chatHistory));
-
-  }catch(err){
+    chatHistory.push({role:'user',content:text},{role:'assistant',content:cleanReply});
+    localStorage.setItem(S.HIST,JSON.stringify(chatHistory.slice(-20)));
+    setStatus('online','接続中');
+  }catch(e){
     removeTyping(typing);
-    appendMsg('error','⚠️ '+err.message);
+    appendMsg('error','申し訳ありません。接続が切れました。もう一度短めにお願いします。');
+    setStatus('error','エラー');
   }
-  document.getElementById('send-btn').disabled=false;
 }
 
-async function callGemini(text,imageData,imageType,googleData){
-  const parts=[];
-  if(imageData) parts.push({inline_data:{mime_type:imageType,data:imageData}});
+async function callGemini(text, googleData){
+  // タイムアウト対策：Flashモデルを使用し、レスポンスを速める
+  const model = "gemini-1.5-flash"; 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
   
-  let userContent = buildSystemPrompt() + "\n\n了三さんからの入力: " + text;
-  if(googleData) userContent += "\n\n【Googleデータ】\n" + googleData;
-  parts.push({text: userContent});
-
-  // 1.5 Pro を使用し、出力上限を4000トークンに拡大（途切れ防止）
-  const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key='+API_KEY;
-  const res=await fetch(url,{
+  const prompt = `${buildSystemPrompt()}\n\n【Googleデータ】\n${googleData}\n\n了三さんの指示：${text}`;
+  
+  const res = await fetch(url,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      contents:[{role:'user',parts}],
-      generationConfig:{temperature:0.7, maxOutputTokens:4000}
+      contents:[{role:'user',parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.7, maxOutputTokens:2000} // トークンを絞って速く出す
     })
   });
   const data=await res.json();
-  if(res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text){
-    return data.candidates[0].content.parts[0].text;
-  }
-  throw new Error(data.error?.message || '通信エラー');
-}
-
-async function callClaude(text,imageData,imageType,googleData){
-  const messages=[];
-  let userText=text||'（画像を確認）';
-  if(googleData) userText+='\n\n【Googleデータ】\n'+googleData;
-
-  const userContent=[];
-  if(imageData) userContent.push({type:'image',source:{type:'base64',media_type:imageType,data:imageData}});
-  userContent.push({type:'text',text:userText});
-  messages.push({role:'user',content:userContent});
-
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':API_KEY,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body:JSON.stringify({
-      model:'claude-3-5-sonnet-20240620',
-      max_tokens:4000,
-      system:buildSystemPrompt(),
-      messages:messages
-    })
-  });
-  const data=await res.json();
-  return data.content[0].text;
+  return data.candidates[0].content.parts[0].text;
 }
 
 async function fetchGoogleData(query){
-  if(!GAS_URL) return "（Google連携URLが未設定です）";
   try {
     const res = await fetch(GAS_URL + "?q=" + encodeURIComponent(query));
     const data = await res.json();
-    return data.result || "データが見つかりませんでした。";
-  } catch(e) { return "連携エラー"; }
+    return data.result || "データなし";
+  } catch(e) { return "（Google連携タイムアウト）"; }
 }
 
-function appendMsg(type,text,isHistory=false){
+function appendMsg(type,text,isHist=false){
   const box=document.getElementById('chat-box');
   const wrap=document.createElement('div');
-  wrap.className=`msg-wrap ${type==='user'?'user':'ai'}`;
-  
-  const now = new Date();
-  const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0');
-  
-  const label=document.createElement('div');label.className='msg-label';
-  label.textContent=(type==='user'?'了三さん':'AI秘書') + " ・ " + timeStr;
-  
+  wrap.className=`msg-wrap ${type}`;
+  const label=document.createElement('div');
+  label.className='msg-label';
+  label.textContent=(type==='user'?'了三さん':'AI秘書')+' ・ '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
   const msg=document.createElement('div');
   msg.className=`msg ${type}`;
   msg.textContent=text;
-  
   wrap.appendChild(label);wrap.appendChild(msg);box.appendChild(wrap);
-  if(!isHistory) scrollToBottom();
+  if(!isHist) box.scrollTop=box.scrollHeight;
 }
 
-function addTask(text,deadline){
-  tasks.push({id:Date.now(),text:text,deadline:deadline,done:false});
+function addTask(txt){
+  tasks.push({text:txt,done:false});
   localStorage.setItem(S.TASKS,JSON.stringify(tasks));
   updateTaskBanner();
 }
 
 function updateTaskBanner(){
-  const n=tasks.filter(t=>!t.done).length;
-  const b=document.getElementById('task-banner');
-  const badge=document.getElementById('task-count-badge');
-  if(n>0){b.classList.add('visible');badge.textContent=n+'件'}
-  else{b.classList.remove('visible')}
+  const count=tasks.filter(t=>!t.done).length;
+  document.getElementById('task-banner').style.display=count>0?'flex':'none';
+  document.getElementById('task-count-badge').textContent=count;
 }
 
 function showTaskList(){
-  const open=tasks.filter(t=>!t.done);
-  if(open.length===0){appendMsg('ai','了三さん、未完了タスクはありません。');return}
-  let h = "📋 未完了タスク一覧\n\n";
-  open.forEach((t,i)=> h += `${i+1}. ${t.text} (期限:${t.deadline})\n`);
-  appendMsg('ai', h);
-}
-
-function saveApiKey(){
-  const val=document.getElementById('api-key-input').value.trim();
-  if(!val) return;
-  API_KEY=val;
-  API_TYPE=val.startsWith('sk-ant')?'claude':'gemini';
-  localStorage.setItem(S.KEY,API_KEY);
-  localStorage.setItem(S.TYPE,API_TYPE);
-  toggleSetup();
-  location.reload();
-}
-
-function saveGasUrl(){
-  const val=document.getElementById('gas-url-input').value.trim();
-  localStorage.setItem(S.GAS,val);
-  location.reload();
-}
-
-function toggleSetup(){
-  const p=document.getElementById('setup-panel');
-  p.classList.toggle('visible');
+  const list=tasks.filter(t=>!t.done).map((t,i)=>`${i+1}. ${t.text}`).join('\n');
+  appendMsg('ai',`📋 現在の未完了タスクです：\n${list||'なし'}`);
 }
 
 function quickAction(type){
   const input=document.getElementById('user-input');
-  if(type==='予約確認') input.value = "今週の予定をまとめてください";
-  else if(type==='メール確認') input.value = "最新のメールを3件確認して";
-  else input.value = type + "の記録をお願いします";
-  input.focus();
+  if(type==='予約確認') input.value='今週の予定を簡潔にまとめて';
+  else if(type==='メール確認') input.value='最新のメールを確認して';
+  else input.value=type+'しました。';
+  sendMessage();
 }
 
-async function handleFile(event){
-  const file=event.target.files[0]; if(!file)return;
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    pendingImg=e.target.result.split(',')[1];
-    pendingImgType=file.type;
-    document.getElementById('pending-badge').style.display='block';
-  };
-  reader.readAsDataURL(file);
+function saveSettings(){
+  const k=document.getElementById('api-key-input').value.trim();
+  const g=document.getElementById('gas-url-input').value.trim();
+  if(k) localStorage.setItem(S.KEY,k);
+  if(g) localStorage.setItem(S.GAS,g);
+  location.reload();
 }
 
+function toggleSetup(){ document.getElementById('setup-panel').classList.toggle('visible'); }
+function clearChat(){ localStorage.setItem(S.HIST,'[]'); location.reload(); }
+function fullReset(){ localStorage.clear(); location.reload(); }
+function setStatus(s,l){ 
+  document.getElementById('status-dot').className='status-dot '+s;
+  document.getElementById('status-label').textContent=l;
+}
 function showTyping(){
-  const box=document.getElementById('chat-box');
-  const wrap=document.createElement('div');wrap.className='msg-wrap ai';
-  const t=document.createElement('div');t.className='msg ai typing';
-  t.innerHTML='<span></span><span></span><span></span>';
-  wrap.appendChild(t);box.appendChild(wrap);scrollToBottom();return wrap;
+  const d=document.createElement('div'); d.className='typing'; d.textContent='秘書が入力中...';
+  document.getElementById('chat-box').appendChild(d); return d;
 }
-function removeTyping(el){if(el?.parentNode)el.remove()}
-function scrollToBottom(){const b=document.getElementById('chat-box');b.scrollTop=b.scrollHeight}
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
-function clearChat(){ if(confirm('履歴をクリアしますか？')){localStorage.setItem(S.HIST,'[]'); location.reload();}}
-function fullReset(){ if(confirm('全データを消去しますか？')){localStorage.clear(); location.reload();}}
-function exportData(){
-  const data = localStorage.getItem(S.TASKS);
-  const blob = new Blob([data], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'backup.json'; a.click();
-}
+function removeTyping(el){ if(el) el.remove(); }
+function handleKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } }
 </script>
 </body>
 </html>
