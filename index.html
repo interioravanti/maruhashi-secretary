@@ -337,7 +337,10 @@ ${recentHealth}
 【重要な注意】
 - 了三さんの発言を勝手にタスクとして登録しない
 - 「システム連携不可」などの誤った情報を伝えない
-- 応答は短く簡潔にまとめる（最大300文字程度を目安に）`;
+- 応答は必ず文章を完結させる。途中で切れてはいけない
+- 長い一覧を求められた場合、直近の重要なものに絞って簡潔にまとめる
+- 箇条書きで簡潔に。1回の応答は最大15行程度に収める
+- マークダウン記法（###や**など）は絶対に使わない`;
 }
 
 // ===== メッセージ送信 =====
@@ -412,7 +415,9 @@ async function callClaude(text,imageData,imageType,googleData){
   // 今回のメッセージ
   let userText=text||'（ファイルを確認してください）';
   if(googleData){
-    userText+='\n\n【以下はGmail・カレンダーから取得したデータです】\n'+googleData;
+    let trimmedData=googleData;
+    if(trimmedData.length>5000) trimmedData=trimmedData.substring(0,5000)+'\n\n（以降省略）';
+    userText+='\n\n【Gmail・カレンダーから取得したデータ】\n'+trimmedData;
   }
 
   const userContent=[];
@@ -454,7 +459,12 @@ async function callGemini(text,imageData,imageType,googleData){
   const parts=[];
   if(imageData) parts.push({inline_data:{mime_type:imageType,data:imageData}});
   let userText=text||'（ファイルを確認してください）';
-  if(googleData) userText+='\n\n【Gmail・カレンダーデータ】\n'+googleData;
+  if(googleData){
+    // Geminiの入力が大きすぎると応答が途切れるため、データを制限
+    let trimmedData=googleData;
+    if(trimmedData.length>3000) trimmedData=trimmedData.substring(0,3000)+'\n\n（以降省略。データが多いため、上記の範囲で回答してください）';
+    userText+='\n\n【Gmail・カレンダーから取得したデータ】\n'+trimmedData;
+  }
   parts.push({text:buildSystemPrompt()+'\n\n了三さんの入力：'+userText});
 
   const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+API_KEY;
@@ -463,7 +473,7 @@ async function callGemini(text,imageData,imageType,googleData){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       contents:[{role:'user',parts}],
-      generationConfig:{temperature:0.7,maxOutputTokens:800}
+      generationConfig:{temperature:0.7,maxOutputTokens:1200}
     })
   });
   const data=await res.json();
