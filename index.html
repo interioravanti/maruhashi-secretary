@@ -97,7 +97,6 @@
     #send-btn:disabled{opacity:.4;cursor:not-allowed}
     .footer{text-align:center;font-size:0.6rem;color:var(--text-dim);padding:4px;background:var(--dark);flex-shrink:0;display:flex;justify-content:center;gap:16px}
     .footer button{background:none;border:none;color:var(--gold-dim);font-size:0.6rem;cursor:pointer;text-decoration:underline;font-family:'Noto Sans JP',sans-serif}
-    /* Google integration banner */
     .g-banner{background:linear-gradient(135deg,#1a237e,#0d47a1);border-bottom:1px solid #1565c0;padding:8px 16px;display:none;align-items:center;gap:10px;flex-shrink:0;cursor:pointer}
     .g-banner.visible{display:flex}
     .g-banner-text{font-size:0.7rem;color:#90caf9;flex:1}
@@ -128,7 +127,6 @@
   <span class="banner-count" id="task-count-badge">0件</span>
 </div>
 
-<!-- Google連携バナー -->
 <div class="g-banner" id="g-banner">
   <span style="font-size:1rem">📧</span>
   <span class="g-banner-text" id="g-banner-text">Gmail・カレンダー連携が利用可能です</span>
@@ -139,7 +137,7 @@
   <div class="setup-label">🔑 API設定</div>
   <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px">AIキー（Claude または Gemini）</div>
   <div class="setup-row">
-    <input type="password" class="setup-input" id="api-key-input" placeholder="sk-ant-...（Claude）または AIzaSy...（Gemini）">
+    <input type="password" class="setup-input" id="api-key-input" placeholder="sk-ant-... または AIzaSy...">
     <button class="btn-save" onclick="saveApiKey()">保存</button>
   </div>
   <p class="setup-hint">Claude: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> ／ Gemini: <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></p>
@@ -147,10 +145,9 @@
   <div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">
     <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:4px">📧 Google連携URL（オプション）</div>
     <div class="setup-row">
-      <input type="text" class="setup-input" id="gas-url-input" placeholder="Google Apps Script のデプロイURL（後で設定可）">
+      <input type="text" class="setup-input" id="gas-url-input" placeholder="Google Apps Script のデプロイURL">
       <button class="btn-save" onclick="saveGasUrl()" style="background:var(--blue);font-size:0.75rem;padding:10px 14px">保存</button>
     </div>
-    <p class="setup-hint">Gmail・カレンダー連携に必要。設定手順は後ほどご案内します。</p>
   </div>
 </div>
 
@@ -165,24 +162,12 @@
 </div>
 
 <div id="chat-box">
-  <div class="msg-wrap ai">
-    <div class="msg-label">AI秘書</div>
-    <div class="msg ai">了三さん、お疲れ様です。
-
-何でも気軽に話しかけてください。
-
-📅 予約ボタン → 今後の予約一覧を表示
-📧 メールボタン → 今日のメールを確認
-💬 テキスト入力 → 何でも相談OK
-
-メールやLINEの内容をそのまま貼り付けても対応できます。</div>
   </div>
-</div>
 
 <div id="input-area">
   <div style="flex:1;display:flex;flex-direction:column;gap:4px">
     <div id="pending-badge" class="pending-badge" style="display:none">📎 画像待機中</div>
-    <textarea id="user-input" placeholder="メッセージを入力、または貼り付け..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <textarea id="user-input" placeholder="メッセージを入力..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
   </div>
   <div class="input-btns">
     <label for="image-input" class="btn-attach" title="写真・PDFを送る">📎</label>
@@ -199,7 +184,6 @@
 </div>
 
 <script>
-// ===== ストレージキー =====
 const S={KEY:'maru_key',TYPE:'maru_type',TASKS:'maru_tasks',HEALTH:'maru_health',HIST:'maru_hist',GAS:'maru_gas'};
 let API_KEY=localStorage.getItem(S.KEY)||'';
 let API_TYPE=localStorage.getItem(S.TYPE)||'';
@@ -209,18 +193,21 @@ let healthLog=JSON.parse(localStorage.getItem(S.HEALTH)||'[]');
 let chatHistory=JSON.parse(localStorage.getItem(S.HIST)||'[]');
 let pendingImg=null,pendingImgType='image/jpeg';
 
-// ===== 初期化 =====
 window.addEventListener('DOMContentLoaded',()=>{
+  if(chatHistory.length === 0) {
+    appendMsg('ai', "了三さん、お疲れ様です。何でも気軽に話しかけてください。\n\n📅 予約ボタン → 予定一覧を表示\n📧 メールボタン → メールの確認\n💬 入力 → 相談OK");
+  } else {
+    chatHistory.slice(-15).forEach(h => appendMsg(h.role==='assistant'?'ai':'user', h.content, true));
+  }
+  
   if(!API_KEY){
     document.getElementById('setup-panel').classList.add('visible');
     setStatus('error','未設定');
   } else {
     if(!API_TYPE) API_TYPE=API_KEY.startsWith('sk-ant')?'claude':'gemini';
-    const label=API_TYPE==='claude'?'Claude接続中':'Gemini接続中';
-    setStatus('online',label);
+    setStatus('online', API_TYPE==='claude'?'Claude接続中':'Gemini接続中');
     updateTaskBanner();
     if(GAS_URL) document.getElementById('g-banner').classList.add('visible');
-    setTimeout(checkOverdueTasks,1200);
   }
 });
 
@@ -229,201 +216,116 @@ function setStatus(s,label){
   document.getElementById('status-label').textContent=label||'';
 }
 
-// ===== API設定 =====
-function saveApiKey(){
-  const val=document.getElementById('api-key-input').value.trim();
-  if(val.startsWith('sk-ant')){
-    API_TYPE='claude';
-  } else if(val.startsWith('AIza')){
-    API_TYPE='gemini';
-  } else {
-    alert('APIキーの形式が正しくありません。\n\nClaude: sk-ant-... で始まるキー\nGemini: AIzaSy... で始まるキー');
-    return;
-  }
-  API_KEY=val;
-  localStorage.setItem(S.KEY,API_KEY);
-  localStorage.setItem(S.TYPE,API_TYPE);
-  document.getElementById('setup-panel').classList.remove('visible');
-  const label=API_TYPE==='claude'?'Claude接続中':'Gemini接続中';
-  setStatus('online',label);
-  updateTaskBanner();
-  const c=tasks.filter(t=>!t.done).length;
-  appendMsg('ai',`APIキーを保存しました（${API_TYPE==='claude'?'Claude':'Gemini'}）。準備完了です。\n\n未完了タスク：${c}件\n何からお手伝いしますか？`);
-}
-
-function saveGasUrl(){
-  const val=document.getElementById('gas-url-input').value.trim();
-  if(val && !val.startsWith('https://script.google.com')){alert('Google Apps ScriptのURLは\nhttps://script.google.com で始まります');return}
-  GAS_URL=val;
-  localStorage.setItem(S.GAS,GAS_URL);
-  if(GAS_URL){
-    document.getElementById('g-banner').classList.add('visible');
-    document.getElementById('g-banner-text').textContent='Gmail・カレンダー連携済み';
-    appendMsg('ai','Google連携URLを保存しました。「📧 メール」「📅 予約」ボタンでGmail・カレンダーにアクセスできます。');
-  }
-}
-
-function toggleSetup(){
-  const p=document.getElementById('setup-panel');
-  p.classList.toggle('visible');
-  if(API_KEY) document.getElementById('api-key-input').value=API_KEY;
-  if(GAS_URL) document.getElementById('gas-url-input').value=GAS_URL;
-}
-
-// ===== システムプロンプト =====
 function buildSystemPrompt(){
   const openTasks=tasks.filter(t=>!t.done);
-  const taskSummary=openTasks.length>0
-    ? openTasks.map((t,i)=>`${i+1}. ${t.text}（期限:${t.deadline||'未設定'}／登録:${t.createdAt}）`).join('\n')
-    : 'なし';
-  const recentHealth=healthLog.slice(-8).map(l=>
-    `${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`
-  ).join('\n')||'なし';
+  const taskSummary=openTasks.length>0 ? openTasks.map((t,i)=>`${i+1}. ${t.text}（期限:${t.deadline}）`).join('\n') : 'なし';
   const now=new Date();
-  const ds=now.toLocaleDateString('ja-JP');
-  const dn=['日','月','火','水','木','金','土'][now.getDay()];
-  const hasGAS=GAS_URL?'連携済み（Gmail・カレンダーのデータを取得可能）':'未設定';
+  return `あなたは丸橋了三さんの専属AI秘書です。了三さんはダイセイタクシーの代表です。
 
-  return `あなたは丸橋了三さんの専属AI秘書です。了三さんはダイセイタクシーの代表で、毎日忙しく働いています。
+【性格】
+- 了三さんを「了三さん」と呼ぶ。
+- 温かく、誠実で、簡潔な言葉使い。
+- 無理に短くせず、重要な情報は正確に伝える。
 
-【あなたの性格】
-- 了三さんを「了三さん」と呼ぶ
-- 温かく寄り添いながらも、大事な場面ではデータや数字で的確にアドバイスする
-- 了三さんの体調や気分を気遣い、励ます
-- 簡潔に答える。長文は避け、要点をまとめる
-- マークダウン記法（###や**など）は使わない。プレーンテキストで見やすく整理する
-
-【会社情報】
-ダイセイタクシー / 長野県長野市戸隠栃原4385-15 / TEL: 026-214-5962
-WhatsApp: +81 90 3585 3669
-
-【今日】${ds}（${dn}曜日）
-
-【Google連携状況】${hasGAS}
-Gmail・カレンダーのデータが提供された場合は、それを活用して正確に回答する。
-
-【タスク管理】
+【今日の状況】
+日時：${now.toLocaleString('ja-JP')}
 未完了タスク：
 ${taskSummary}
 
-タスクのルール：
-- 了三さんが明確に「〇〇をやる」「〇〇しておく」と言った場合のみタスクとして検出する
-- 質問や確認だけではタスクにしない
-- 了三さんが「完了した」と報告したら、簡単な確認をして信頼する（過度な追及はしない）
-- タスクについて自然な会話の中で触れる程度にする。毎回追及しない
-
-タスクを検出した場合のみ、返答の末尾に：
+【返答のルール】
+- マークダウン記法（###や**など）は絶対に使わない。
+- 予定の一覧など、長くなる場合は「午前」「午後」などで区切り、最後まで出力する。
+- 了三さんが何かを「やる」と言ったら以下の形式で末尾に含める。
 [TASK_DETECTED]
-タスク内容：（具体的に）
-期限：（了三さんが言った日時、または「要確認」）
-[/TASK_DETECTED]
-
-【予約検出】
-新しい予約・依頼の内容が含まれる場合のみ：
-【予約確認】
-・件名：
-・日時：
-・区間：
-・人数：
-・料金：
-・備考：
-「カレンダーに登録しますか？」で締める。
-
-【健康管理】
-最近の記録：
-${recentHealth}
-健康アドバイスは求められた時、または明らかに心配な状況の時にだけ行う。普段は温かく見守る。
-
-【重要な注意】
-- 了三さんの発言を勝手にタスクとして登録しない
-- 「システム連携不可」などの誤った情報を伝えない
-- 応答は必ず文章を完結させる。途中で切れてはいけない
-- 長い一覧を求められた場合、直近の重要なものに絞って簡潔にまとめる
-- 箇条書きで簡潔に。1回の応答は最大15行程度に収める
-- マークダウン記法（###や**など）は絶対に使わない`;
+内容：
+期限：
+[/TASK_DETECTED]`;
 }
 
-// ===== メッセージ送信 =====
 async function sendMessage(){
   const input=document.getElementById('user-input');
   const text=input.value.trim();
   if(!text&&!pendingImg)return;
-  if(!API_KEY){document.getElementById('setup-panel').classList.add('visible');return}
-
-  appendMsg('user',text||'（ファイルを送信しました）');
-  input.value='';autoResize(input);
-
-  const imgData=pendingImg,imgType=pendingImgType;
+  
+  appendMsg('user',text||'（画像を送信）');
+  input.value=''; autoResize(input);
+  
+  const imgData=pendingImg;
+  const imgType=pendingImgType;
   pendingImg=null;
   document.getElementById('pending-badge').style.display='none';
 
-  // Google連携：メール確認・予約確認の場合はGASからデータ取得
   let googleData='';
-  if(GAS_URL && (text.includes('メール') || text.includes('予約') || text.includes('スケジュール') || text.includes('カレンダー') || text.includes('今日') || text.includes('明日') || text.includes('今週') || text.includes('予定'))){
-    try{
-      googleData=await fetchGoogleData(text);
-    }catch(e){
-      console.warn('Google連携エラー:',e);
-    }
+  if(GAS_URL && (text.includes('予定') || text.includes('予約') || text.includes('メール') || text.includes('スケジュール'))){
+    googleData = await fetchGoogleData(text);
   }
 
   document.getElementById('send-btn').disabled=true;
   const typing=showTyping();
 
   try{
-    const reply=API_TYPE==='claude'?await callClaude(text,imgData,imgType,googleData):await callGemini(text,imgData,imgType,googleData);
+    const reply = (API_TYPE==='claude') 
+      ? await callClaude(text, imgData, imgType, googleData) 
+      : await callGemini(text, imgData, imgType, googleData);
+    
     removeTyping(typing);
 
-    // タスク検出
     const taskMatch=reply.match(/\[TASK_DETECTED\]([\s\S]*?)\[\/TASK_DETECTED\]/);
     const cleanReply=reply.replace(/\[TASK_DETECTED\][\s\S]*?\[\/TASK_DETECTED\]/g,'').trim();
 
-    appendMsg('ai',cleanReply);
+    appendMsg('ai', cleanReply);
 
     if(taskMatch){
       const info=taskMatch[1].trim();
-      const tt=(info.match(/タスク内容[：:](.+)/)||[])[1]||info;
+      const tt=(info.match(/内容[：:](.+)/)||[])[1]||'新規タスク';
       const dl=(info.match(/期限[：:](.+)/)||[])[1]||'要確認';
       addTask(tt.trim(),dl.trim());
     }
 
-    if(cleanReply.includes('【予約確認】'))showConfirmCard();
-
-    // 履歴保存
-    chatHistory.push({role:'user',content:text||'（ファイル送信）'});
+    chatHistory.push({role:'user',content:text||'（画像送信）'});
     chatHistory.push({role:'assistant',content:cleanReply});
     if(chatHistory.length>40)chatHistory=chatHistory.slice(-40);
     localStorage.setItem(S.HIST,JSON.stringify(chatHistory));
 
-    setStatus('online',API_TYPE==='claude'?'Claude接続中':'Gemini接続中');
   }catch(err){
     removeTyping(typing);
-    setStatus('error','エラー');
     appendMsg('error','⚠️ '+err.message);
   }
   document.getElementById('send-btn').disabled=false;
 }
 
-// ===== Claude API =====
+async function callGemini(text,imageData,imageType,googleData){
+  const parts=[];
+  if(imageData) parts.push({inline_data:{mime_type:imageType,data:imageData}});
+  
+  let userContent = buildSystemPrompt() + "\n\n了三さんからの入力: " + text;
+  if(googleData) userContent += "\n\n【Googleデータ】\n" + googleData;
+  parts.push({text: userContent});
+
+  // 1.5 Pro を使用し、出力上限を4000トークンに拡大（途切れ防止）
+  const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key='+API_KEY;
+  const res=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{role:'user',parts}],
+      generationConfig:{temperature:0.7, maxOutputTokens:4000}
+    })
+  });
+  const data=await res.json();
+  if(res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text){
+    return data.candidates[0].content.parts[0].text;
+  }
+  throw new Error(data.error?.message || '通信エラー');
+}
+
 async function callClaude(text,imageData,imageType,googleData){
   const messages=[];
-  // 直近の会話履歴
-  chatHistory.slice(-10).forEach(h=>{
-    messages.push({role:h.role==='assistant'?'assistant':'user',content:h.content});
-  });
-
-  // 今回のメッセージ
-  let userText=text||'（ファイルを確認してください）';
-  if(googleData){
-    let trimmedData=googleData;
-    if(trimmedData.length>5000) trimmedData=trimmedData.substring(0,5000)+'\n\n（以降省略）';
-    userText+='\n\n【Gmail・カレンダーから取得したデータ】\n'+trimmedData;
-  }
+  let userText=text||'（画像を確認）';
+  if(googleData) userText+='\n\n【Googleデータ】\n'+googleData;
 
   const userContent=[];
-  if(imageData){
-    userContent.push({type:'image',source:{type:'base64',media_type:imageType,data:imageData}});
-  }
+  if(imageData) userContent.push({type:'image',source:{type:'base64',media_type:imageType,data:imageData}});
   userContent.push({type:'text',text:userText});
   messages.push({role:'user',content:userContent});
 
@@ -436,87 +338,49 @@ async function callClaude(text,imageData,imageType,googleData){
       'anthropic-dangerous-direct-browser-access':'true'
     },
     body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1500,
+      model:'claude-3-5-sonnet-20240620',
+      max_tokens:4000,
       system:buildSystemPrompt(),
       messages:messages
     })
   });
-
   const data=await res.json();
-  if(data.error){
-    const msg=data.error.message||JSON.stringify(data.error);
-    if(res.status===401)throw new Error('認証エラー（401）\nAPIキーが無効です。\n\n「⚙ API設定」から正しいキーを入力してください。');
-    if(res.status===429)throw new Error('レート制限（429）\n少し待ってから再送信してください。');
-    if(res.status===400)throw new Error('リクエストエラー（400）\n'+msg);
-    throw new Error('エラー（'+res.status+'）: '+msg);
-  }
-  return data.content.filter(c=>c.type==='text').map(c=>c.text).join('\n');
+  return data.content[0].text;
 }
 
-// ===== Gemini API =====
-async function callGemini(text,imageData,imageType,googleData){
-  const parts=[];
-  if(imageData) parts.push({inline_data:{mime_type:imageType,data:imageData}});
-  let userText=text||'（ファイルを確認してください）';
-  if(googleData){
-    // Geminiの入力が大きすぎると応答が途切れるため、データを制限
-    let trimmedData=googleData;
-    if(trimmedData.length>3000) trimmedData=trimmedData.substring(0,3000)+'\n\n（以降省略。データが多いため、上記の範囲で回答してください）';
-    userText+='\n\n【Gmail・カレンダーから取得したデータ】\n'+trimmedData;
-  }
-  parts.push({text:buildSystemPrompt()+'\n\n了三さんの入力：'+userText});
-
-  const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+API_KEY;
-  const res=await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      contents:[{role:'user',parts}],
-      generationConfig:{temperature:0.7,maxOutputTokens:1200}
-    })
-  });
-  const data=await res.json();
-  if(res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text){
-    return data.candidates[0].content.parts[0].text;
-  }
-  const c=data.error?.code;
-  const m=data.error?.message||'HTTP '+res.status;
-  if(c===403)throw new Error('アクセス拒否（403）\n'+m+'\n\nGoogle AI Studioでキーの制限を「制限なし」にしてください。');
-  if(c===429)throw new Error('リクエスト過多（429）\n少し待ってから再送信してください。');
-  if(c===404)throw new Error('モデルが見つかりません（404）\n'+m);
-  throw new Error('エラー（'+(c||res.status)+'）: '+m);
-}
-
-// ===== Google Apps Script連携 =====
 async function fetchGoogleData(query){
-  if(!GAS_URL)return '';
-  try{
-    let action='';
-    if(query.includes('メール') || query.includes('未読'))action='gmail';
-    else if(query.includes('予約') || query.includes('スケジュール') || query.includes('カレンダー') || query.includes('予定') || query.includes('今日') || query.includes('明日') || query.includes('今週'))action='calendar';
-    else action='both';
-
-    const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(query),{
-      method:'GET',
-      mode:'cors'
-    });
-    const data=await res.json();
-    if(data.error)return '（Google連携エラー: '+data.error+'）';
-    return data.result||'';
-  }catch(e){
-    return '（Google連携に接続できませんでした）';
-  }
+  if(!GAS_URL) return "（Google連携URLが未設定です）";
+  try {
+    const res = await fetch(GAS_URL + "?q=" + encodeURIComponent(query));
+    const data = await res.json();
+    return data.result || "データが見つかりませんでした。";
+  } catch(e) { return "連携エラー"; }
 }
 
-// ===== タスク管理 =====
+function appendMsg(type,text,isHistory=false){
+  const box=document.getElementById('chat-box');
+  const wrap=document.createElement('div');
+  wrap.className=`msg-wrap ${type==='user'?'user':'ai'}`;
+  
+  const now = new Date();
+  const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0');
+  
+  const label=document.createElement('div');label.className='msg-label';
+  label.textContent=(type==='user'?'了三さん':'AI秘書') + " ・ " + timeStr;
+  
+  const msg=document.createElement('div');
+  msg.className=`msg ${type}`;
+  msg.textContent=text;
+  
+  wrap.appendChild(label);wrap.appendChild(msg);box.appendChild(wrap);
+  if(!isHistory) scrollToBottom();
+}
+
 function addTask(text,deadline){
-  tasks.push({id:Date.now(),text:text,deadline:deadline,createdAt:new Date().toLocaleDateString('ja-JP'),done:false});
-  saveTasks();updateTaskBanner();
-  appendMsg('ai',`📋 了三さん、タスクを記録しました。\n\n内容：${text}\n期限：${deadline}\n\n忘れないように管理しておきますね。`);
+  tasks.push({id:Date.now(),text:text,deadline:deadline,done:false});
+  localStorage.setItem(S.TASKS,JSON.stringify(tasks));
+  updateTaskBanner();
 }
-
-function saveTasks(){localStorage.setItem(S.TASKS,JSON.stringify(tasks))}
 
 function updateTaskBanner(){
   const n=tasks.filter(t=>!t.done).length;
@@ -528,110 +392,53 @@ function updateTaskBanner(){
 
 function showTaskList(){
   const open=tasks.filter(t=>!t.done);
-  if(open.length===0){appendMsg('ai','了三さん、未完了タスクはゼロです。素晴らしい。');return}
-  const box=document.getElementById('chat-box');
-  const card=document.createElement('div');card.className='task-card';
-  let h=`<h4>📋 未完了タスク（${open.length}件）</h4>`;
-  open.forEach(t=>{
-    h+=`<div class="task-item"><span class="task-status open">未完了</span><div style="flex:1"><div class="task-text">${escHtml(t.text)}</div><div class="task-deadline">期限：${t.deadline} ／ 登録：${t.createdAt}</div></div></div>`;
-  });
-  h+=`<div class="task-btns"><button class="btn-task btn-task-done" onclick="requestTaskProof()">✓ 完了報告</button><button class="btn-task btn-task-snooze" onclick="snoozeTask()">期限延長</button><button class="btn-task btn-task-snooze" onclick="clearAllTasks()" style="color:var(--red);border-color:var(--red)">🗑 全削除</button></div>`;
-  card.innerHTML=h;box.appendChild(card);scrollToBottom();
+  if(open.length===0){appendMsg('ai','了三さん、未完了タスクはありません。');return}
+  let h = "📋 未完了タスク一覧\n\n";
+  open.forEach((t,i)=> h += `${i+1}. ${t.text} (期限:${t.deadline})\n`);
+  appendMsg('ai', h);
 }
 
-function requestTaskProof(){
-  const open=tasks.filter(t=>!t.done);
-  if(!open.length)return;
-  document.getElementById('user-input').value='以下のタスクが完了しました：\n'+open.map((t,i)=>`${i+1}. ${t.text}`).join('\n');
-  document.getElementById('user-input').focus();
-}
-function snoozeTask(){
-  document.getElementById('user-input').value='タスクの期限を延長したいです。';
-  document.getElementById('user-input').focus();
-}
-
-function checkOverdueTasks(){
-  const open=tasks.filter(t=>!t.done);
-  if(!open.length)return;
-  appendMsg('ai',`了三さん、お疲れ様です。未完了タスクが${open.length}件ありますのでお知らせします：\n\n${open.map(t=>`・${t.text}（期限：${t.deadline}）`).join('\n')}\n\nお時間ある時に確認してくださいね。`);
+function saveApiKey(){
+  const val=document.getElementById('api-key-input').value.trim();
+  if(!val) return;
+  API_KEY=val;
+  API_TYPE=val.startsWith('sk-ant')?'claude':'gemini';
+  localStorage.setItem(S.KEY,API_KEY);
+  localStorage.setItem(S.TYPE,API_TYPE);
+  toggleSetup();
+  location.reload();
 }
 
-// ===== 予約確認カード =====
-function showConfirmCard(){
-  const box=document.getElementById('chat-box');
-  const card=document.createElement('div');card.className='confirm-card';
-  card.innerHTML=`<h4>📅 カレンダー登録</h4><p style="font-size:0.7rem;color:var(--text-dim);margin-bottom:8px">上記の内容でよろしければ登録</p><div class="confirm-btns"><button class="btn-register" onclick="doRegister(this)">✓ 登録する</button><button class="btn-cancel" onclick="this.closest('.confirm-card').remove()">✕ キャンセル</button></div>`;
-  box.appendChild(card);scrollToBottom();
-}
-function doRegister(btn){
-  btn.disabled=true;btn.textContent='登録済み ✓';btn.style.background='var(--green)';
-  // GAS経由でカレンダー登録を試みる
-  if(GAS_URL){
-    appendMsg('ai','了三さん、カレンダーに登録しました。');
-  } else {
-    appendMsg('ai','了三さん、登録を記録しました。\n\n※ Google連携を設定すると、自動でカレンダーに書き込まれます。\n「⚙ API設定」からGoogle連携URLを設定してください。');
-  }
+function saveGasUrl(){
+  const val=document.getElementById('gas-url-input').value.trim();
+  localStorage.setItem(S.GAS,val);
+  location.reload();
 }
 
-// ===== 健康ログ =====
+function toggleSetup(){
+  const p=document.getElementById('setup-panel');
+  p.classList.toggle('visible');
+}
+
 function quickAction(type){
-  const now=new Date();
-  const ts=now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
-  const ds=now.toLocaleDateString('ja-JP');
-  let msg='';
-
-  if(type==='起床'){
-    healthLog.push({type,time:now.toISOString()});
-    localStorage.setItem(S.HEALTH,JSON.stringify(healthLog));
-    msg=`${ds} ${ts} 起床しました。`;
-  }else if(type==='就寝'){
-    const lw=[...healthLog].reverse().find(l=>l.type==='起床');
-    const h=lw?((now-new Date(lw.time))/3600000).toFixed(1):null;
-    healthLog.push({type,time:now.toISOString()});
-    localStorage.setItem(S.HEALTH,JSON.stringify(healthLog));
-    msg=`${ds} ${ts} 就寝します。${h?`（活動時間: ${h}時間）`:''}`;
-  }else if(type==='食事'){
-    msg=`${ts} 食事をしました。内容を教えてください（または📎で写真を送ってください）。`;
-  }else if(type==='健康チェック'){
-    const r=healthLog.slice(-8).map(l=>`${l.type}: ${new Date(l.time).toLocaleString('ja-JP')}`).join('\n');
-    msg=`健康チェックをお願いします。\n\n【最近の記録】\n${r||'記録なし'}`;
-  }else if(type==='予約確認'){
-    msg='本日の予約と今週の予定をまとめてください。';
-  }else if(type==='メール確認'){
-    msg='今日の重要なメールを確認して、対応が必要なものを教えてください。';
-  }
-
-  document.getElementById('user-input').value=msg;
-  document.getElementById('user-input').focus();
-  if(type==='起床'||type==='就寝')sendMessage();
+  const input=document.getElementById('user-input');
+  if(type==='予約確認') input.value = "今週の予定をまとめてください";
+  else if(type==='メール確認') input.value = "最新のメールを3件確認して";
+  else input.value = type + "の記録をお願いします";
+  input.focus();
 }
 
-// ===== ファイル処理 =====
 async function handleFile(event){
-  const file=event.target.files[0];if(!file)return;
+  const file=event.target.files[0]; if(!file)return;
   const reader=new FileReader();
   reader.onload=(e)=>{
     pendingImg=e.target.result.split(',')[1];
-    pendingImgType=file.type||'image/jpeg';
+    pendingImgType=file.type;
     document.getElementById('pending-badge').style.display='block';
-    appendMsg('user',`📎 ${file.name}`);
-    appendMsg('ai',`「${file.name}」を受け取りました。送信ボタンを押すと解析します。`);
   };
-  reader.readAsDataURL(file);event.target.value='';
+  reader.readAsDataURL(file);
 }
 
-// ===== UI =====
-function appendMsg(type,text){
-  const box=document.getElementById('chat-box');
-  const wrap=document.createElement('div');
-  wrap.className=`msg-wrap ${type==='user'?'user':'ai'}`;
-  const label=document.createElement('div');label.className='msg-label';
-  label.textContent=type==='user'?'了三さん':type==='error'?'⚠ エラー':type==='warning'?'⚠ 秘書より警告':'AI秘書';
-  const msg=document.createElement('div');
-  msg.className=`msg ${type==='error'?'error':type==='warning'?'warning':type}`;
-  msg.textContent=text;
-  wrap.appendChild(label);wrap.appendChild(msg);box.appendChild(wrap);scrollToBottom();
-}
 function showTyping(){
   const box=document.getElementById('chat-box');
   const wrap=document.createElement('div');wrap.className='msg-wrap ai';
@@ -643,39 +450,13 @@ function removeTyping(el){if(el?.parentNode)el.remove()}
 function scrollToBottom(){const b=document.getElementById('chat-box');b.scrollTop=b.scrollHeight}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px'}
-function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-
-// ===== データ管理 =====
+function clearChat(){ if(confirm('履歴をクリアしますか？')){localStorage.setItem(S.HIST,'[]'); location.reload();}}
+function fullReset(){ if(confirm('全データを消去しますか？')){localStorage.clear(); location.reload();}}
 function exportData(){
-  const data={tasks,healthLog,chatHistory,exportedAt:new Date().toISOString()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;
-  a.download=`maruhashi_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();URL.revokeObjectURL(url);
-  appendMsg('ai','💾 バックアップを保存しました。');
-}
-function clearChat(){
-  if(!confirm('チャット履歴をクリアしますか？'))return;
-  chatHistory=[];localStorage.setItem(S.HIST,'[]');
-  document.getElementById('chat-box').innerHTML='';
-  appendMsg('ai','了三さん、チャット履歴をクリアしました。新しい気持ちで始めましょう！');
-}
-function clearAllTasks(){
-  if(!confirm('未完了タスクを全て削除しますか？'))return;
-  tasks=tasks.filter(t=>t.done);
-  saveTasks();updateTaskBanner();
-  appendMsg('ai','了三さん、未完了タスクを全て削除しました。すっきりしましたね。');
-}
-function fullReset(){
-  if(!confirm('全データ（タスク・健康記録・チャット履歴）をリセットしますか？\nAPIキーとGoogle連携URLは保持されます。'))return;
-  tasks=[];healthLog=[];chatHistory=[];
-  localStorage.setItem(S.TASKS,'[]');
-  localStorage.setItem(S.HEALTH,'[]');
-  localStorage.setItem(S.HIST,'[]');
-  updateTaskBanner();
-  document.getElementById('chat-box').innerHTML='';
-  appendMsg('ai','了三さん、全データをリセットしました。\nまた一緒に頑張りましょう！何からお手伝いしますか？');
+  const data = localStorage.getItem(S.TASKS);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'backup.json'; a.click();
 }
 </script>
 </body>
