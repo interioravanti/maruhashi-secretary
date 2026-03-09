@@ -492,11 +492,18 @@ async function fetchGoogleData(query, forceAction){
       else if(query.includes('今月')) gasQuery='今月';
     }
 
-    const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(gasQuery),{method:'GET',mode:'cors'});
+    // タイムアウト30秒
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),30000);
+    const res=await fetch(GAS_URL+'?action='+action+'&q='+encodeURIComponent(gasQuery),{method:'GET',mode:'cors',signal:controller.signal});
+    clearTimeout(timeout);
     const data=await res.json();
     if(data.error)return '（Google連携エラー: '+data.error+'）';
     return data.result||'';
-  }catch(e){return '（Google連携に接続できませんでした）';}
+  }catch(e){
+    if(e.name==='AbortError')return '（Google連携がタイムアウトしました。しばらく待ってから再試行してください）';
+    return '（Google連携に接続できませんでした: '+e.message+'）';
+  }
 }
 
 function addTask(text,deadline,priority,type){
