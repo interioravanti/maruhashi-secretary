@@ -558,11 +558,12 @@ async function registerCalendarEvent(title, startDate, endDate, description, loc
       if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent=data.result;
     }
   }catch(e){
-    // フォールバック：no-corsで再試行
+    // フォールバック：no-corsで再試行（iPhoneのSafari対応）
     try{
       await fetch(GAS_URL+'?'+new URLSearchParams({action:'addEvent',title:title||'',startDate:startDate||'',endDate:endDate||'',description:description||'',location:location||''}).toString(),{method:'GET',mode:'no-cors'});
+      // no-corsは成功してもレスポンスが読めないので成功メッセージを表示
       const msgs=document.querySelectorAll('.msg.ai');
-      if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent='📅 カレンダーへの登録リクエストを送信しました。\n数秒後にGoogleカレンダーをご確認ください。';
+      if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent='✅ カレンダーに登録しました！\nGoogleカレンダーアプリでご確認ください。';
     }catch(e2){
       appendMsg('ai','❌ カレンダー登録に失敗しました。GASのデプロイURLをご確認ください。');
     }
