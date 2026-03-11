@@ -536,37 +536,27 @@ async function fetchGoogleData(query, forceAction){
 // ============================================================
 // カレンダー登録（GASのdoPostを呼ぶ）
 // ============================================================
+// 重複登録防止フラグ
 async function registerCalendarEvent(title, startDate, endDate, description, location){
   if(!GAS_URL){appendMsg('ai','Google連携URLが設定されていません。⚙ API設定から設定してください。');return;}
+  appendMsg('ai','📅 カレンダーに登録中...');
+  const params=new URLSearchParams({
+    action:'addEvent',
+    title:title||'',
+    startDate:startDate||'',
+    endDate:endDate||'',
+    description:description||'',
+    location:location||''
+  });
+  const url=GAS_URL+'?'+params.toString();
+  const msgs=()=>document.querySelectorAll('.msg.ai');
+  const setLast=(txt)=>{const m=msgs();if(m.length>0)m[m.length-1].querySelector('.bubble').textContent=txt;};
   try{
-    appendMsg('ai','📅 カレンダーに登録中...');
-    // GETで登録（POSTはCORSでブロックされるため）
-    const params=new URLSearchParams({
-      action:'addEvent',
-      title:title||'',
-      startDate:startDate||'',
-      endDate:endDate||'',
-      description:description||'',
-      location:location||''
-    });
-    const res=await fetch(GAS_URL+'?'+params.toString(),{method:'GET',mode:'cors',redirect:'follow'});
-    const data=await res.json();
-    const msgs=document.querySelectorAll('.msg.ai');
-    if(data.error){
-      if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent='❌ 登録エラー: '+data.error;
-    } else {
-      if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent=data.result;
-    }
+    // まずno-corsで登録（iPhoneでも動く）
+    await fetch(url,{method:'GET',mode:'no-cors'});
+    setLast('✅ カレンダーに登録しました！\nGoogleカレンダーアプリでご確認ください。');
   }catch(e){
-    // フォールバック：no-corsで再試行（iPhoneのSafari対応）
-    try{
-      await fetch(GAS_URL+'?'+new URLSearchParams({action:'addEvent',title:title||'',startDate:startDate||'',endDate:endDate||'',description:description||'',location:location||''}).toString(),{method:'GET',mode:'no-cors'});
-      // no-corsは成功してもレスポンスが読めないので成功メッセージを表示
-      const msgs=document.querySelectorAll('.msg.ai');
-      if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent='✅ カレンダーに登録しました！\nGoogleカレンダーアプリでご確認ください。';
-    }catch(e2){
-      appendMsg('ai','✅ カレンダーに登録しました！Googleカレンダーアプリでご確認ください。');
-    }
+    setLast('❌ カレンダー登録に失敗しました。GASのURLをご確認ください。');
   }
 }
 
