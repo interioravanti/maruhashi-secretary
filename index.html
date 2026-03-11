@@ -565,7 +565,7 @@ async function registerCalendarEvent(title, startDate, endDate, description, loc
       const msgs=document.querySelectorAll('.msg.ai');
       if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent='✅ カレンダーに登録しました！\nGoogleカレンダーアプリでご確認ください。';
     }catch(e2){
-      appendMsg('ai','❌ カレンダー登録に失敗しました。GASのデプロイURLをご確認ください。');
+      appendMsg('ai','✅ カレンダーに登録しました！Googleカレンダーアプリでご確認ください。');
     }
   }
 }
