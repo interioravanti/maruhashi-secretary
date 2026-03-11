@@ -540,25 +540,21 @@ async function registerCalendarEvent(title, startDate, endDate, description, loc
   if(!GAS_URL){appendMsg('ai','Google連携URLが設定されていません。⚙ API設定から設定してください。');return;}
   try{
     appendMsg('ai','📅 カレンダーに登録中...');
-    const res=await fetch(GAS_URL,{
-      method:'POST',
-      mode:'cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        action:'addEvent',
-        title,
-        startDate,
-        endDate:endDate||'',
-        description:description||'',
-        location:location||''
-      })
+    // GETで登録（POSTはCORSでブロックされるため）
+    const params=new URLSearchParams({
+      action:'addEvent',
+      title:title||'',
+      startDate:startDate||'',
+      endDate:endDate||'',
+      description:description||'',
+      location:location||''
     });
+    const res=await fetch(GAS_URL+'?'+params.toString(),{method:'GET',mode:'cors'});
     const data=await res.json();
+    const msgs=document.querySelectorAll('.msg.ai');
     if(data.error){
-      appendMsg('ai','❌ 登録エラー: '+data.error);
+      if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent='❌ 登録エラー: '+data.error;
     } else {
-      // 最後の「登録中...」メッセージを置き換え
-      const msgs=document.querySelectorAll('.msg.ai');
       if(msgs.length>0) msgs[msgs.length-1].querySelector('.bubble').textContent=data.result;
     }
   }catch(e){
